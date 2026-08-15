@@ -25,6 +25,7 @@ const D = {
 };
 
 const CLE_STOCKAGE = 'on-mange-quoi/choisies';
+const CLE_ECONOME = 'on-mange-quoi/pdf-econome';
 const RAYON_DEFAUT = 'autre';
 
 /* ─────────────────────────────────────────────────── petits utilitaires ── */
@@ -419,7 +420,8 @@ function listeEnTexte() {
  * qui coulent d'une colonne à l'autre puis d'une page à l'autre.
  * Renvoie le document jsPDF ; c'est l'appelant qui décide de l'enregistrer.
  */
-function construirePdf() {
+function construirePdf(options) {
+  const eco = !!(options && options.monochrome);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
@@ -427,12 +429,15 @@ function construirePdf() {
   const COL_L = (PAGE_L - 2 * MARGE - ECART) / 2;
   const BAS = PAGE_H - MARGE - 6;
 
-  const ENCRE = [60, 42, 30];
-  const TOMATE = [228, 87, 46];
-  const GRIS = [141, 114, 97];
-  // Mêmes couleurs de rayon que sur la page, en RVB pour jsPDF.
-  const PALETTE = [[111, 154, 63], [228, 87, 46], [201, 138, 12],
-                   [163, 70, 140], [61, 155, 181], [201, 112, 31]];
+  // En mode économe, tout passe au noir et au gris : aucun aplat de couleur,
+  // aucun bandeau plein, l'imprimante ne dépense presque rien.
+  const ENCRE = eco ? [0, 0, 0] : [60, 42, 30];
+  const TOMATE = eco ? [0, 0, 0] : [228, 87, 46];
+  const GRIS = eco ? [105, 105, 105] : [141, 114, 97];
+  const PALETTE = eco
+    ? [[0, 0, 0]]
+    : [[111, 154, 63], [228, 87, 46], [201, 138, 12],
+       [163, 70, 140], [61, 155, 181], [201, 112, 31]];
 
   const choisies = D.recettes.filter((r) => D.choisies.has(r.nom));
   const groupes = compilerListe();
@@ -440,11 +445,29 @@ function construirePdf() {
   let page = 1;
 
   function enTetePage(premiere) {
-    const h = premiere ? 26 : 18;
+    const h = premiere ? 24 : 16;
     // Fond blanc explicite : certaines visionneuses affichent autrement une
     // page transparente sur du gris ou du noir.
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, PAGE_L, PAGE_H, 'F');
+
+    if (eco) {
+      // Un simple filet sous le titre au lieu du bandeau plein.
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('Fraunces', 'bold');
+      doc.setFontSize(premiere ? 18 : 12.5);
+      doc.text('On mange quoi ?', MARGE, premiere ? 15 : 11);
+      doc.setFont('Outfit', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...GRIS);
+      doc.text("Liste d'épicerie · " + dateLongue(maintenant),
+        PAGE_L - MARGE, premiere ? 15 : 11, { align: 'right' });
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.6);
+      doc.line(MARGE, premiere ? 18.5 : 14, PAGE_L - MARGE, premiere ? 18.5 : 14);
+      return premiere ? 21 : 16;
+    }
+
     // Le bandeau rayé du store de bistrot, repris de la page.
     doc.setFillColor(...TOMATE);
     doc.rect(0, 0, PAGE_L, h, 'F');
@@ -453,18 +476,19 @@ function construirePdf() {
 
     doc.setTextColor(255, 255, 255);
     doc.setFont('Fraunces', 'bold');
-    doc.setFontSize(premiere ? 19 : 13.5);
-    doc.text('On mange quoi ?', MARGE, premiere ? 17 : 12.5);
+    doc.setFontSize(premiere ? 18 : 12.5);
+    doc.text('On mange quoi ?', MARGE, premiere ? 15.5 : 11);
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(9);
+    doc.setFontSize(8.5);
     doc.setTextColor(255, 238, 226);
-    doc.text("Liste d'épicerie · " + dateLongue(maintenant), PAGE_L - MARGE, premiere ? 17 : 12.5, { align: 'right' });
+    doc.text("Liste d'épicerie · " + dateLongue(maintenant),
+      PAGE_L - MARGE, premiere ? 15.5 : 11, { align: 'right' });
     return h;
   }
 
   function piedPage() {
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setTextColor(...GRIS);
     doc.text(`${choisies.length} repas · ${groupes.reduce((n, g) => n + g.articles.length, 0)} articles`,
       MARGE, PAGE_H - 9);
@@ -472,29 +496,29 @@ function construirePdf() {
   }
 
   // ── page 1 : en-tête + rappel du menu ──────────────────────────────────
-  let hautColonnes = enTetePage(true) + 10;
+  let hautColonnes = enTetePage(true) + 8;
 
   doc.setFont('Outfit', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(...TOMATE);
   doc.text('AU MENU', MARGE, hautColonnes);
-  hautColonnes += 5;
+  hautColonnes += 4.5;
 
   doc.setFont('Outfit', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setTextColor(...ENCRE);
   const menu = doc.splitTextToSize(
     choisies.map((r) => r.nom + (r.portions ? ` (${r.portions})` : '')).join('   ·   '),
     PAGE_L - 2 * MARGE);
   doc.text(menu, MARGE, hautColonnes);
-  hautColonnes += menu.length * 4.4 + 4;
+  hautColonnes += menu.length * 4 + 3;
 
-  doc.setDrawColor(226, 208, 190);
+  doc.setDrawColor(...(eco ? [170, 170, 170] : [226, 208, 190]));
   doc.setLineWidth(0.4);
   doc.setLineDashPattern([1.4, 1.4], 0);
   doc.line(MARGE, hautColonnes, PAGE_L - MARGE, hautColonnes);
   doc.setLineDashPattern([], 0);
-  hautColonnes += 8;
+  hautColonnes += 7;
 
   // ── coulée sur deux colonnes ───────────────────────────────────────────
   let col = 0;
@@ -509,7 +533,7 @@ function construirePdf() {
       piedPage();
       doc.addPage();
       page += 1;
-      hautColonnes = enTetePage(false) + 10;
+      hautColonnes = enTetePage(false) + 8;
       col = 0;
       y = hautColonnes;
     }
@@ -519,57 +543,97 @@ function construirePdf() {
 
   function dessinerTitreRayon(rayon, teinte) {
     doc.setFont('Fraunces', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(9.5);
     doc.setTextColor(...teinte);
     doc.text(rayon.nom, x(), y);
     doc.setDrawColor(...teinte);
-    doc.setLineWidth(0.5);
-    doc.line(x(), y + 1.9, x() + COL_L, y + 1.9);
-    y += 7;
+    doc.setLineWidth(0.45);
+    doc.line(x(), y + 1.7, x() + COL_L, y + 1.7);
+    y += 6;
   }
 
-  function hauteurArticle(a) {
-    doc.setFontSize(7);
-    const src = doc.splitTextToSize(a.sources.join(', '), COL_L - 5.6);
-    return 4.3 + src.length * 3 + 1.4;
+  // Géométrie d'un article : la case à cocher, le nom, puis la provenance
+  // entre parenthèses en plus petit, au bout de la même ligne.
+  const RETRAIT = 5;      // décalage du texte, après la case à cocher
+  const H_NOM = 3.9;      // avance sous la ligne du nom
+  const H_SUITE = 2.8;    // avance sous chaque ligne de provenance en dessous
+  const BOUT_MINI = 14;   // en deçà, la provenance passe directement à la ligne
+
+  /**
+   * Découpe la provenance en lignes. La première tient au bout de la ligne du
+   * nom (chaîne vide s'il n'y reste pas la place), les suivantes reviennent
+   * sous le nom, alignées sur le retrait.
+   */
+  function decouperProvenance(texte, placeBout) {
+    doc.setFont('Outfit', 'normal');
+    doc.setFontSize(6.6);
+    const pleine = COL_L - RETRAIT;
+    const lignes = [''];
+    texte.split(' ').forEach((mot) => {
+      const i = lignes.length - 1;
+      const essai = lignes[i] ? lignes[i] + ' ' + mot : mot;
+      const large = i === 0 ? placeBout : pleine;
+      // Le « lignes[i] vide » évite la boucle sans fin sur un mot trop long.
+      if (doc.getTextWidth(essai) <= large || (!lignes[i] && i > 0)) lignes[i] = essai;
+      else lignes.push(mot);
+    });
+    return lignes;
+  }
+
+  /** Mesure sans rien dessiner : hauteur, lignes, et où commence le bout. */
+  function mesurerArticle(a) {
+    doc.setFont('Outfit', 'normal');
+    doc.setFontSize(8.8);
+    const finNom = RETRAIT + doc.getTextWidth(a.nom) + 1.3;
+    const placeBout = COL_L - finNom;
+    const lignes = decouperProvenance('(' + a.sources.join(', ') + ')',
+      placeBout >= BOUT_MINI ? placeBout : 0);
+    return { finNom, lignes, hauteur: H_NOM + (lignes.length - 1) * H_SUITE + 0.5 };
   }
 
   function dessinerArticle(a) {
+    const m = mesurerArticle(a);
+
     // La case à cocher, pour barrer au crayon dans l'allée.
-    doc.setDrawColor(198, 176, 156);
+    doc.setDrawColor(...(eco ? [90, 90, 90] : [198, 176, 156]));
     doc.setLineWidth(0.3);
-    doc.roundedRect(x(), y - 2.8, 3.2, 3.2, 0.7, 0.7);
+    doc.roundedRect(x(), y - 2.4, 2.9, 2.9, 0.6, 0.6);
 
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(9.5);
+    doc.setFontSize(8.8);
     doc.setTextColor(...ENCRE);
-    doc.text(a.nom, x() + 5.6, y);
-    y += 4.3;
+    doc.text(a.nom, x() + RETRAIT, y);
 
-    // Pas d'italique embarqué : la provenance se distingue par sa taille et
-    // sa couleur, ça suffit largement à l'œil.
-    doc.setFontSize(7);
+    doc.setFontSize(6.6);
     doc.setTextColor(...GRIS);
-    doc.splitTextToSize(a.sources.join(', '), COL_L - 5.6).forEach((ligne) => {
-      doc.text(ligne, x() + 5.6, y);
-      y += 3;
+    let yy = y;
+    m.lignes.forEach((ligne, i) => {
+      if (i === 0) {
+        if (ligne) doc.text(ligne, x() + m.finNom, yy);
+        return;
+      }
+      yy += H_SUITE;
+      doc.text(ligne, x() + RETRAIT, yy);
     });
-    y += 1.4;
+
+    y += m.hauteur;
   }
 
   groupes.forEach(({ rayon, articles }, i) => {
-    const teinte = rayon.id === RAYON_DEFAUT ? [179, 52, 28] : PALETTE[i % PALETTE.length];
+    const teinte = rayon.id === RAYON_DEFAUT && !eco
+      ? [179, 52, 28]
+      : PALETTE[i % PALETTE.length];
     // On ne laisse jamais un titre de rayon seul en bas de colonne.
-    if (placeRestante() < 7 + hauteurArticle(articles[0])) colonneSuivante();
+    if (placeRestante() < 6 + mesurerArticle(articles[0]).hauteur) colonneSuivante();
     dessinerTitreRayon(rayon, teinte);
     articles.forEach((a) => {
-      if (placeRestante() < hauteurArticle(a)) {
+      if (placeRestante() < mesurerArticle(a).hauteur) {
         colonneSuivante();
         dessinerTitreRayon({ nom: rayon.nom + ' (suite)' }, teinte);
       }
       dessinerArticle(a);
     });
-    y += 3;
+    y += 2.5;
   });
 
   piedPage();
@@ -577,7 +641,9 @@ function construirePdf() {
 }
 
 function telechargerPdf() {
-  construirePdf().save(`epicerie-${dateCourte(new Date())}.pdf`);
+  const eco = E('pdfEconome').checked;
+  construirePdf({ monochrome: eco })
+    .save(`epicerie-${dateCourte(new Date())}${eco ? '-nb' : ''}.pdf`);
 }
 
 /* ═══════════════════════════════════════════════ onglet « Gérer » ═══════ */
@@ -935,6 +1001,15 @@ function brancherEvenements() {
     } catch (e) {
       toast('PDF impossible : ' + e.message, true);
     }
+  });
+
+  // La case garde son état d'une visite à l'autre, comme la sélection.
+  const econome = E('pdfEconome');
+  econome.checked = localStorage.getItem(CLE_ECONOME) === '1';
+  E('etiquetteEconome').classList.toggle('is-on', econome.checked);
+  econome.addEventListener('change', () => {
+    E('etiquetteEconome').classList.toggle('is-on', econome.checked);
+    try { localStorage.setItem(CLE_ECONOME, econome.checked ? '1' : '0'); } catch (e) { /* tant pis */ }
   });
 
   E('btnImprimer').addEventListener('click', () => window.print());

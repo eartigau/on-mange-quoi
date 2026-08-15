@@ -79,8 +79,15 @@ revenir, la sélection est toujours là.
 **La liste.** Elle se compile toute seule sous les repas. Chaque ingrédient
 indique entre parenthèses les plats qui le demandent, ce qui permet de savoir
 quoi remplacer si on change d'idée dans l'allée. Trois sorties : le PDF
-(deux colonnes, une case à cocher devant chaque article), l'impression directe,
-et une copie en texte brut à coller dans un message.
+(deux colonnes serrées, une case à cocher devant chaque article, la provenance
+en petit au bout de la ligne), l'impression directe, et une copie en texte brut
+à coller dans un message.
+
+La case **Économiser l'encre** sort le même PDF entièrement en noir sur blanc :
+plus de bandeau plein ni de titres colorés, juste un filet sous le titre. Une
+semaine de repas tient alors couramment sur une seule page, et l'imprimante ne
+dépense presque rien. Le choix est mémorisé d'une fois à l'autre, et le fichier
+est suffixé `-nb` pour ne pas se mélanger avec la version couleur.
 
 **Gérer les recettes.** Le formulaire ajoute ou modifie un plat. Si la recette
 introduit des ingrédients jamais vus, la page le signale tout de suite, et la
