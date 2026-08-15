@@ -7,19 +7,20 @@ l'ordre des allées, en PDF ou à l'écran.
 
 ## Comment c'est organisé
 
-Trois fichiers YAML dans [data/](data/) contiennent tout le contenu, et c'est
-là qu'on modifie les choses :
+Tout le site tient dans [docs/](docs/), le dossier que GitHub Pages sait
+publier tel quel. Les trois fichiers YAML de [docs/data/](docs/data/)
+contiennent tout le contenu, et c'est là qu'on modifie les choses :
 
 | Fichier | Ce qu'il contient |
 | --- | --- |
-| [data/recettes.yaml](data/recettes.yaml) | Les 50 repas : nom, tags, portions, liste d'ingrédients, note |
-| [data/ingredients.yaml](data/ingredients.yaml) | Le rayon de chaque ingrédient (« persil » → légumes frais) |
-| [data/meta.yaml](data/meta.yaml) | L'ordre des rayons à l'épicerie et les groupes de tags des filtres |
+| [docs/data/recettes.yaml](docs/data/recettes.yaml) | Les 50 repas : nom, tags, portions, liste d'ingrédients, note |
+| [docs/data/ingredients.yaml](docs/data/ingredients.yaml) | Le rayon de chaque ingrédient (« persil » → légumes frais) |
+| [docs/data/meta.yaml](docs/data/meta.yaml) | L'ordre des rayons à l'épicerie et les groupes de tags des filtres |
 
-La page elle-même est dans [web/](web/) : [index.html](web/index.html) pour la
-structure, [app.js](web/app.js) pour toute la logique, [theme.css](web/theme.css)
-et [app.css](web/app.css) pour l'allure. Tout ce dont la page a besoin est
-embarqué dans [web/lib/](web/lib/) : js-yaml pour lire les YAML, jsPDF pour
+La page elle-même : [index.html](docs/index.html) pour la structure,
+[app.js](docs/app.js) pour toute la logique, [theme.css](docs/theme.css)
+et [app.css](docs/app.css) pour l'allure. Tout ce dont la page a besoin est
+embarqué dans [docs/lib/](docs/lib/) : js-yaml pour lire les YAML, jsPDF pour
 fabriquer le PDF, et `polices.js` qui contient les deux polices du site
 réduites au latin, pour que le PDF écrive « bœuf haché » correctement. Rien
 n'est chargé depuis un serveur extérieur, à part les polices d'écran de Google
@@ -51,18 +52,26 @@ l'onglet **Gérer les recettes** peut réécrire les YAML directement (une copie
 
 ## En ligne
 
-Le site marche aussi en pur statique : il suffit de servir le dossier du projet
-tel quel (GitHub Pages, ou n'importe quel hébergement de fichiers). Les filtres,
-la compilation de la liste, le PDF et l'impression fonctionnent pareil, tout se
-passe dans le navigateur.
+Le site est publié par GitHub Pages depuis le dossier `docs/` de la branche
+`main` : un `git push` suffit à mettre la version en ligne à jour. Les filtres,
+la compilation de la liste, le PDF et l'impression fonctionnent exactement
+pareil qu'à la maison, tout se passe dans le navigateur.
 
-La seule différence : sans le serveur local, la page ne peut pas écrire sur le
-disque. L'onglet **Gérer** reste utilisable, mais au lieu d'enregistrer il
-propose de télécharger `recettes.yaml` et `ingredients.yaml` mis à jour, qu'on
-dépose ensuite dans `data/`.
+En ligne, la page demande d'abord un mot de passe. C'est un écriteau, pas un
+verrou : le site est fait de fichiers statiques, donc la vérification se fait en
+JavaScript et les YAML restent atteignables à leur adresse directe. Ça suffit
+pour que la page ne s'ouvre pas au premier venu, et c'est tout ce qu'on lui
+demande. À la maison, sur le serveur local, la porte ne s'affiche pas.
 
-Un double-clic sur `web/index.html` ne suffit pas : le navigateur refuse de lire
-les YAML depuis `file://`. Il faut passer par le serveur, ou par l'hébergement.
+L'autre différence : sans le serveur local, la page ne peut pas écrire sur le
+disque. L'onglet **Gérer** reste utilisable pour bricoler, mais rien n'est
+conservé au rechargement ; il propose de télécharger `recettes.yaml` et
+`ingredients.yaml` mis à jour, qu'on dépose ensuite dans `docs/data/`. Les
+vraies modifications de recettes se font à la maison, puis on pousse.
+
+Un double-clic sur `docs/index.html` ne suffit pas : le navigateur refuse de
+lire les YAML depuis `file://`. Il faut passer par le serveur, ou par le site
+en ligne.
 
 ## Se servir de la page
 
@@ -107,7 +116,7 @@ jamais perdu : il atterrit dans « À classer », bien visible au bas de la list
 
 ## Ajouter des choses à la main
 
-Un repas de plus dans `data/recettes.yaml` :
+Un repas de plus dans `docs/data/recettes.yaml` :
 
 ```yaml
   - nom: Gratin de courgettes
@@ -121,13 +130,13 @@ Un repas de plus dans `data/recettes.yaml` :
     note: Bien égoutter les courgettes, sinon c'est de la soupe.
 ```
 
-Les tags viennent des `facettes` de `data/meta.yaml` ; un tag inventé sur place
+Les tags viennent des `facettes` de `docs/data/meta.yaml` ; un tag inventé sur place
 fonctionne quand même, il se retrouve simplement regroupé sous « Autres tags »
-dans les filtres. Un ingrédient inconnu de `data/ingredients.yaml` apparaît dans
+dans les filtres. Un ingrédient inconnu de `docs/data/ingredients.yaml` apparaît dans
 « À classer », il suffit alors de lui choisir un rayon depuis l'onglet Gérer.
 
 Pour changer l'ordre du PDF, on déplace les entrées de `rayons` dans
-`data/meta.yaml` : c'est cet ordre-là, et pas l'alphabet, qui décide de la
+`docs/data/meta.yaml` : c'est cet ordre-là, et pas l'alphabet, qui décide de la
 séquence sur la liste.
 
 ## D'où viennent les données

@@ -1,11 +1,11 @@
 # Copies de sauvegarde faites par le serveur local avant chaque écriture
-data/*.bak
-data/*.tmp
+docs/data/*.bak
+docs/data/*.tmp
 
 # Fichiers de travail de Word sur le document source
 ~$*
 
 # Pages d'essai jetables déposées à côté de index.html
-web/_*.html
+docs/_*.html
 
 .DS_Store

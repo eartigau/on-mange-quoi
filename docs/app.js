@@ -97,6 +97,70 @@ function telecharger(nomFichier, texte, type) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+/* ─────────────────────────────────────────────────────── porte d'entrée ──
+   En ligne, la page demande un mot de passe avant de s'afficher.
+
+   Soyons clairs sur ce que ça vaut : ce n'est PAS une serrure. Le site est un
+   paquet de fichiers statiques, la vérification se fait ici même, dans du
+   JavaScript que n'importe qui peut lire, et les YAML restent téléchargeables
+   à leur adresse directe sans jamais passer par cette page. C'est l'écriteau
+   « chez nous » sur la porte du chalet, pas un verrou. Rien de confidentiel ne
+   doit atterrir dans ce dépôt en comptant là-dessus.
+
+   À la maison (serveur local), la porte ne s'affiche pas du tout.
+*/
+
+const CLE_ENTREE = 'on-mange-quoi/entree';
+// Empreinte djb2 du mot de passe, histoire de ne pas l'écrire en toutes
+// lettres dans le fichier. Ça ne protège rien de plus, ça évite juste de le
+// lire d'un coup d'œil.
+const EMPREINTE_MDP = 0x597d06f8;
+
+function empreinte(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function surMachineLocale() {
+  return ['localhost', '127.0.0.1', '::1', ''].includes(location.hostname);
+}
+
+function dejaEntre() {
+  try { return localStorage.getItem(CLE_ENTREE) === '1'; } catch (e) { return false; }
+}
+
+/** Résout quand on a le droit d'entrer. Immédiat à la maison. */
+function passerLaPorte() {
+  return new Promise((resolve) => {
+    if (surMachineLocale() || dejaEntre()) return resolve();
+
+    const porte = E('porte');
+    porte.hidden = false;
+    document.body.style.overflow = 'hidden';
+    E('motDePasse').focus();
+
+    E('formPorte').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const saisie = E('motDePasse').value.trim().toLowerCase();
+      if (empreinte(saisie) !== EMPREINTE_MDP) {
+        E('porteRate').hidden = false;
+        E('motDePasse').value = '';
+        E('motDePasse').focus();
+        // On relance l'animation de refus à chaque essai raté.
+        porte.classList.remove('porte-secoue');
+        void porte.offsetWidth;
+        porte.classList.add('porte-secoue');
+        return;
+      }
+      try { localStorage.setItem(CLE_ENTREE, '1'); } catch (err) { /* tant pis */ }
+      porte.hidden = true;
+      document.body.style.overflow = '';
+      resolve();
+    });
+  });
+}
+
 /* ─────────────────────────────────────────────────────────── chargement ── */
 
 async function lireYaml(chemin) {
@@ -145,6 +209,9 @@ async function detecterMode() {
   const pastille = E('modePill');
   pastille.textContent = D.ecriture ? '● serveur local' : '○ lecture seule';
   pastille.classList.toggle('mode-local', D.ecriture);
+  // L'onglet « Gérer » n'est peut-être pas encore ouvert : on fige tout de
+  // suite l'état du bouton d'enregistrement plutôt que d'attendre son rendu.
+  E('btnSauver').disabled = !D.ecriture;
   pastille.title = D.ecriture
     ? 'Le serveur local tourne : les modifications sont écrites directement dans les YAML.'
     : "Page servie sans le serveur local : les modifications se récupèrent en téléchargeant les YAML.";
@@ -1110,6 +1177,7 @@ function brancherEvenements() {
 }
 
 async function demarrer() {
+  await passerLaPorte();
   brancherOnglets();
   try {
     await charger();

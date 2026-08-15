@@ -13,6 +13,20 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>" />
 </head>
 <body>
+  <!-- Écriteau d'entrée, affiché seulement en ligne. Voir le commentaire dans
+       app.js : ça décourage le passant, ça ne protège rien. -->
+  <div class="porte" id="porte" hidden>
+    <form class="porte-boite" id="formPorte" autocomplete="off">
+      <p class="eyebrow">On se connaît&nbsp;?</p>
+      <h2>On mange quoi&nbsp;?</h2>
+      <p class="hint">Les repas de la famille. Le mot de passe se demande à la maison.</p>
+      <input type="password" id="motDePasse" class="champ" placeholder="mot de passe"
+             autocomplete="current-password" autofocus />
+      <button type="submit" class="btn btn-primaire btn-bloc">Entrer</button>
+      <p class="hint porte-rate" id="porteRate" hidden>Ce n'est pas ça. On réessaie&nbsp;?</p>
+    </form>
+  </div>
+
   <div class="bg-orb orb-a"></div>
   <div class="bg-orb orb-b"></div>
 

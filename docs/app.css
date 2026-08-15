@@ -534,3 +534,49 @@
   .jeton { background: none; border-color: #ccc; color: #333; }
   .article.est-deja { display: none !important; }
 }
+
+/* ── Porte d'entrée (en ligne seulement) ─────────────────────────────── */
+
+.porte {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: var(--creme);
+  background-image:
+    radial-gradient(900px 520px at 15% -10%, rgba(244, 172, 26, 0.3), transparent 62%),
+    radial-gradient(760px 480px at 88% 8%, rgba(228, 87, 46, 0.22), transparent 60%),
+    linear-gradient(175deg, var(--creme) 0%, var(--creme2) 100%);
+}
+
+.porte-boite {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  background: var(--carte);
+  border: 1.5px solid var(--ligne);
+  border-radius: var(--rond);
+  padding: 30px 26px 26px;
+  box-shadow: var(--ombre-forte);
+}
+
+.porte-boite .eyebrow { transform: rotate(-2deg); margin-bottom: 2px; }
+.porte-boite h2 { font-size: 1.75rem; font-weight: 900; margin-bottom: 6px; }
+.porte-boite .hint { margin: 0 0 18px; }
+.porte-boite .champ { text-align: center; font-size: 1.05rem; }
+.porte-boite .btn-bloc { margin-top: 2px; }
+
+.porte-rate { color: #b3341c; font-weight: 500; }
+
+/* Petit refus de tête quand le mot de passe ne passe pas. */
+.porte-secoue .porte-boite { animation: secoue 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+@keyframes secoue {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}

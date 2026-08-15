@@ -2,8 +2,8 @@
 """Serveur local du site « On mange quoi ? ».
 
 À la maison, on lance ce script et on ouvre la page dans le navigateur : elle
-sert les fichiers de web/ et de data/, et surtout elle a le droit de réécrire
-data/recettes.yaml et data/ingredients.yaml quand on édite depuis l'onglet
+sert les fichiers de docs/, et surtout elle a le droit de réécrire
+docs/data/recettes.yaml et docs/data/ingredients.yaml quand on édite depuis l'onglet
 « Gérer ».
 
 En ligne (GitHub Pages ou n'importe quel hébergement statique), ce script ne
@@ -31,8 +31,11 @@ import webbrowser
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent
-WEB = RACINE / "web"
-DATA = RACINE / "data"
+# Tout le site tient dans docs/ : c'est le dossier que GitHub Pages sait
+# publier tel quel, et les YAML sont dedans pour que les chemins relatifs de
+# la page marchent aussi bien en local qu'en ligne.
+SITE = (RACINE / "docs").resolve()
+DATA = SITE / "data"
 
 # Seuls ces fichiers-là peuvent être réécrits par la page.
 FICHIERS_INSCRIPTIBLES = {"recettes.yaml", "ingredients.yaml", "meta.yaml"}
@@ -43,22 +46,19 @@ TAILLE_MAX = 1_000_000
 
 
 class Gestionnaire(http.server.SimpleHTTPRequestHandler):
-    """Sert web/ à la racine, data/ tel quel, et expose deux points d'API."""
+    """Sert docs/ à la racine et expose les deux points d'API d'écriture."""
 
     def translate_path(self, path):
         propre = path.split("?", 1)[0].split("#", 1)[0]
         morceaux = [m for m in propre.split("/") if m not in ("", ".", "..")]
 
         if not morceaux:
-            return str(WEB / "index.html")
-        base = DATA if morceaux[0] == "data" else WEB
-        if morceaux[0] == "data":
-            morceaux = morceaux[1:]
+            return str(SITE / "index.html")
 
-        cible = base.joinpath(*morceaux).resolve()
-        # Ceinture et bretelles : on ne sort jamais des deux dossiers servis.
-        if not (str(cible).startswith(str(WEB)) or str(cible).startswith(str(DATA))):
-            return str(WEB / "index.html")
+        cible = SITE.joinpath(*morceaux).resolve()
+        # Ceinture et bretelles : on ne sort jamais du dossier servi.
+        if not str(cible).startswith(str(SITE)):
+            return str(SITE / "index.html")
         return str(cible)
 
     def guess_type(self, path):
@@ -115,7 +115,7 @@ class Gestionnaire(http.server.SimpleHTTPRequestHandler):
             provisoire.write_text(contenu, encoding="utf-8")
             provisoire.replace(cible)
             ecrits.append(nom)
-            print(f"  écrit : data/{nom}")
+            print(f"  écrit : docs/data/{nom}")
 
         return self._json(200, {"ok": True, "ecrits": sorted(ecrits)})
 
@@ -145,7 +145,7 @@ def principal():
     arg.add_argument("--no-ouvrir", action="store_true", help="ne pas ouvrir le navigateur")
     options = arg.parse_args()
 
-    for dossier in (WEB, DATA):
+    for dossier in (SITE, DATA):
         if not dossier.is_dir():
             sys.exit(f"Dossier manquant : {dossier}")
 
