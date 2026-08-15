@@ -66,8 +66,10 @@ les YAML depuis `file://`. Il faut passer par le serveur, ou par l'hébergement.
 
 ## Se servir de la page
 
-**Choisir les repas.** Les filtres de gauche se combinent de façon naturelle :
-plusieurs tags d'un même groupe s'additionnent (soupe **ou** salade), et les
+**Choisir les repas.** Les tuiles ne portent que le nom du plat, pour voir toute
+la carte d'un coup d'œil ; le détail (portions, tags, nombre d'ingrédients)
+s'affiche en infobulle au survol. Les filtres de gauche se combinent de façon
+naturelle : plusieurs tags d'un même groupe s'additionnent (soupe **ou** salade), et les
 groupes se cumulent (soupe **et** végétarien). La recherche fouille aussi dans
 les ingrédients, donc taper « saumon » sort tous les plats qui en contiennent.
 Le bouton « Au hasard : 5 repas » tire au sort parmi ce qui est affiché, ce qui
@@ -82,6 +84,14 @@ quoi remplacer si on change d'idée dans l'allée. Trois sorties : le PDF
 (deux colonnes serrées, une case à cocher devant chaque article, la provenance
 en petit au bout de la ligne), l'impression directe, et une copie en texte brut
 à coller dans un message.
+
+Chaque ingrédient de la liste porte une case à cocher **on en a déjà** : on la
+coche pour ce qui est déjà au garde-manger, la ligne se barre et disparaît du
+PDF, de l'impression et du texte copié. Elle reste visible barrée à l'écran,
+justement pour qu'on n'oublie jamais ce qu'on a écarté, et le compteur de
+chaque rayon passe en « reste / total ». Le bouton **Tout remettre** annule
+d'un coup. Ces marques sont mémorisées d'une visite à l'autre, pensez à les
+remettre à zéro quand le garde-manger se vide.
 
 La case **Économiser l'encre** sort le même PDF entièrement en noir sur blanc :
 plus de bandeau plein ni de titres colorés, juste un filet sous le titre. Une

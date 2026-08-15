@@ -18,6 +18,7 @@ const D = {
   recettes: [],        // liste des recettes
   rayonDe: {},         // ingrédient -> id de rayon
   choisies: new Set(), // noms des recettes cochées
+  dejaLa: new Set(),   // ingrédients qu'on a déjà, écartés de la liste finale
   filtres: new Set(),  // tags actifs
   recherche: '',
   ecriture: false,     // vrai si le serveur local peut écrire les YAML
@@ -26,6 +27,7 @@ const D = {
 
 const CLE_STOCKAGE = 'on-mange-quoi/choisies';
 const CLE_ECONOME = 'on-mange-quoi/pdf-econome';
+const CLE_DEJA = 'on-mange-quoi/deja-la';
 const RAYON_DEFAUT = 'autre';
 
 /* ─────────────────────────────────────────────────── petits utilitaires ── */
@@ -197,6 +199,22 @@ function memoriserChoix() {
   } catch (e) { /* navigation privée : tant pis, on ne mémorise pas */ }
 }
 
+function memoriserDeja() {
+  try {
+    localStorage.setItem(CLE_DEJA, JSON.stringify([...D.dejaLa]));
+  } catch (e) { /* navigation privée : tant pis */ }
+}
+
+function relireDeja() {
+  try {
+    const brut = JSON.parse(localStorage.getItem(CLE_DEJA) || '[]');
+    // On ne garde que les ingrédients qui existent encore quelque part, sinon
+    // la liste enfle indéfiniment au fil des recettes supprimées.
+    const connus = new Set(ingredientsUtilises());
+    brut.filter((i) => connus.has(i)).forEach((i) => D.dejaLa.add(i));
+  } catch (e) { /* rien à relire */ }
+}
+
 function relireChoix() {
   try {
     const brut = JSON.parse(localStorage.getItem(CLE_STOCKAGE) || '[]');
@@ -253,6 +271,16 @@ function compilerListe() {
   return groupes;
 }
 
+/**
+ * La liste telle qu'elle part à l'épicerie : sans ce qu'on a déjà, et sans
+ * les rayons devenus vides du coup.
+ */
+function listeAAcheter() {
+  return compilerListe()
+    .map(({ rayon, articles }) => ({ rayon, articles: articles.filter((a) => !D.dejaLa.has(a.nom)) }))
+    .filter((g) => g.articles.length);
+}
+
 /* ───────────────────────────────────────────────────── rendu : filtres ─── */
 
 function rendreFiltres() {
@@ -302,23 +330,16 @@ function rendreGrille() {
   visibles.forEach((r) => {
     const coche = D.choisies.has(r.nom);
     const tuile = creer('label', 'tuile' + (coche ? ' is-on' : ''));
+    // Volontairement dépouillé : le nom du plat, rien d'autre. Le détail
+    // (tags, portions, ingrédients) se consulte dans l'onglet « Gérer ».
+    tuile.title = `${r.portions ? r.portions + ' portions · ' : ''}${r.ingredients.length} ingrédients\n${r.tags.join(', ')}`;
 
     const boite = creer('input');
     boite.type = 'checkbox';
     boite.checked = coche;
     boite.addEventListener('change', () => basculerRecette(r.nom));
     tuile.appendChild(boite);
-
-    tuile.appendChild(creer('div', 'tuile-nom', r.nom));
-
-    const bouts = [];
-    if (r.portions) bouts.push(`${r.portions} pers.`);
-    bouts.push(`${r.ingredients.length} ingr.`);
-    tuile.appendChild(creer('div', 'tuile-meta', bouts.join(' · ')));
-
-    const zone = creer('div', 'tuile-tags');
-    r.tags.slice(0, 4).forEach((t) => zone.appendChild(creer('span', 'mini-tag', t)));
-    tuile.appendChild(zone);
+    tuile.appendChild(creer('span', 'tuile-nom', r.nom));
 
     hote.appendChild(tuile);
   });
@@ -336,11 +357,17 @@ function rendreListe() {
 
   const choisies = D.recettes.filter((r) => D.choisies.has(r.nom));
   const vide = choisies.length === 0;
+  const aAcheter = vide ? [] : listeAAcheter();
+  const rienAAcheter = aAcheter.length === 0;
+
   E('listeVide').hidden = !vide;
-  E('btnPdf').disabled = vide;
-  E('btnImprimer').disabled = vide;
-  E('btnCopier').disabled = vide;
-  if (vide) return;
+  E('btnPdf').disabled = rienAAcheter;
+  E('btnImprimer').disabled = rienAAcheter;
+  E('btnCopier').disabled = rienAAcheter;
+  if (vide) {
+    E('toutRemettre').hidden = true;
+    return;
+  }
 
   const jetons = creer('div', 'menu-choisi');
   choisies.forEach((r) => {
@@ -355,21 +382,48 @@ function rendreListe() {
   });
   menu.appendChild(jetons);
 
-  compilerListe().forEach(({ rayon, articles }, i) => {
+  const groupes = compilerListe();
+  const nbDeja = groupes.reduce(
+    (n, g) => n + g.articles.filter((a) => D.dejaLa.has(a.nom)).length, 0);
+  const bouton = E('toutRemettre');
+  bouton.hidden = nbDeja === 0;
+  bouton.textContent = `Tout remettre (${nbDeja})`;
+
+  groupes.forEach(({ rayon, articles }, i) => {
     const bloc = creer('div', 'rayon');
     bloc.style.setProperty('--teinte', rayon.id === RAYON_DEFAUT ? '#b3341c' : TEINTES[i % TEINTES.length]);
 
+    const restants = articles.filter((a) => !D.dejaLa.has(a.nom)).length;
     const titre = creer('h3', 'rayon-titre');
     titre.appendChild(creer('span', 'rayon-icone', rayon.icone || '•'));
     titre.appendChild(document.createTextNode(rayon.nom));
-    titre.appendChild(creer('span', 'compte', String(articles.length)));
+    titre.appendChild(creer('span', 'compte',
+      restants === articles.length ? String(articles.length) : `${restants} / ${articles.length}`));
     bloc.appendChild(titre);
 
     const ul = creer('ul');
     articles.forEach((a) => {
+      const deja = D.dejaLa.has(a.nom);
       const li = creer('li');
-      li.appendChild(creer('span', 'ingredient-nom', a.nom));
-      li.appendChild(creer('span', 'ingredient-source', a.sources.join(', ')));
+      const etiquette = creer('label', 'article' + (deja ? ' est-deja' : ''));
+      etiquette.title = deja
+        ? 'On en a déjà : décocher pour le remettre sur la liste'
+        : "On en a déjà à la maison ? Cocher pour l'écarter de la liste";
+
+      const boite = creer('input');
+      boite.type = 'checkbox';
+      boite.checked = deja;
+      boite.addEventListener('change', () => {
+        if (boite.checked) D.dejaLa.add(a.nom);
+        else D.dejaLa.delete(a.nom);
+        memoriserDeja();
+        rendreListe();
+      });
+
+      etiquette.appendChild(boite);
+      etiquette.appendChild(creer('span', 'ingredient-nom', a.nom));
+      etiquette.appendChild(creer('span', 'ingredient-source', a.sources.join(', ')));
+      li.appendChild(etiquette);
       ul.appendChild(li);
     });
     bloc.appendChild(ul);
@@ -405,7 +459,7 @@ function listeEnTexte() {
   lignes.push(`LISTE D'ÉPICERIE, ${dateLongue(new Date())}`);
   lignes.push('Au menu : ' + choisies.map((r) => r.nom).join(' · '));
   lignes.push('');
-  compilerListe().forEach(({ rayon, articles }) => {
+  listeAAcheter().forEach(({ rayon, articles }) => {
     lignes.push(rayon.nom.toUpperCase());
     articles.forEach((a) => {
       lignes.push(`  [ ] ${a.nom}  (${a.sources.join(', ')})`);
@@ -440,7 +494,7 @@ function construirePdf(options) {
        [163, 70, 140], [61, 155, 181], [201, 112, 31]];
 
   const choisies = D.recettes.filter((r) => D.choisies.has(r.nom));
-  const groupes = compilerListe();
+  const groupes = listeAAcheter();
   const maintenant = new Date();
   let page = 1;
 
@@ -1012,6 +1066,13 @@ function brancherEvenements() {
     try { localStorage.setItem(CLE_ECONOME, econome.checked ? '1' : '0'); } catch (e) { /* tant pis */ }
   });
 
+  E('toutRemettre').addEventListener('click', () => {
+    D.dejaLa.clear();
+    memoriserDeja();
+    rendreListe();
+    toast('Tout est remis sur la liste.');
+  });
+
   E('btnImprimer').addEventListener('click', () => window.print());
 
   E('btnCopier').addEventListener('click', async () => {
@@ -1070,6 +1131,7 @@ async function demarrer() {
   }
   await detecterMode();
   relireChoix();
+  relireDeja();
   brancherEvenements();
   rendreChoisir();
 }

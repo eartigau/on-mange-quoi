@@ -204,16 +204,16 @@
 
 .grille-recettes {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(218px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 9px;
 }
 
 .tuile {
   position: relative;
   display: block;
   border: 2px solid var(--ligne);
-  border-radius: 16px;
-  padding: 13px 13px 11px 40px;
+  border-radius: 14px;
+  padding: 9px 12px 9px 36px;
   background: #fff;
   cursor: pointer;
   box-shadow: 0 3px 0 rgba(60, 42, 30, 0.07);
@@ -232,8 +232,8 @@
 .tuile::before {
   content: "";
   position: absolute;
-  left: 13px; top: 14px;
-  width: 18px; height: 18px;
+  left: 12px; top: 10px;
+  width: 17px; height: 17px;
   border: 2px solid #d7c3b2;
   border-radius: 6px;
   background: #fffaf2;
@@ -258,37 +258,19 @@
 .tuile.is-on::after {
   content: "";
   position: absolute;
-  left: 19.5px; top: 17.5px;
-  width: 5px; height: 10px;
+  left: 18.3px; top: 13.3px;
+  width: 4.5px; height: 9px;
   border: solid #fff;
   border-width: 0 2.5px 2.5px 0;
   transform: rotate(43deg);
 }
 
 .tuile-nom {
+  display: block;
   font-family: "Fraunces", Georgia, serif;
   font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.tuile-meta {
-  margin-top: 6px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
-  color: var(--doux);
-}
-
-.tuile-tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
-
-.mini-tag {
-  font-size: 0.67rem;
-  font-weight: 500;
-  color: var(--doux);
-  background: #fdf3e6;
-  border: 1px solid rgba(60, 42, 30, 0.1);
-  border-radius: 999px;
-  padding: 2px 8px;
+  font-size: 0.95rem;
+  line-height: 1.22;
 }
 
 /* ── Menu retenu ─────────────────────────────────────────────────────── */
@@ -379,15 +361,22 @@
 
 .rayon ul { list-style: none; margin: 0; padding: 0; }
 
-.rayon li {
-  margin: 0 0 8px;
-  padding-left: 20px;
+.rayon li { margin: 0 0 8px; }
+
+/* Chaque article se coche : « on en a déjà », donc pas la peine de l'acheter.
+   La case ressemble à celle qu'on cocherait au crayon sur un bout de papier,
+   mais elle sert ici à retirer la ligne du PDF. */
+.article {
   position: relative;
+  display: block;
+  padding-left: 20px;
   line-height: 1.35;
+  cursor: pointer;
 }
 
-/* Une petite case vide devant chaque article, comme sur un vrai bout de papier. */
-.rayon li::before {
+.article input { position: absolute; opacity: 0; pointer-events: none; }
+
+.article::before {
   content: "";
   position: absolute;
   left: 0; top: 4px;
@@ -395,7 +384,30 @@
   border: 1.5px solid #d0bcab;
   border-radius: 4px;
   background: #fff;
+  transition: background 0.15s, border-color 0.15s;
 }
+
+.article:hover::before { border-color: var(--olive); }
+
+.article.est-deja::before { background: var(--olive); border-color: var(--olive); }
+
+.article.est-deja::after {
+  content: "";
+  position: absolute;
+  left: 4.2px; top: 6.2px;
+  width: 3px; height: 6.5px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(43deg);
+}
+
+.article.est-deja .ingredient-nom {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  color: var(--doux);
+}
+
+.article.est-deja .ingredient-source { opacity: 0.5; }
 
 .ingredient-nom { font-size: 0.95rem; font-weight: 500; }
 
@@ -522,4 +534,5 @@
   .card { background: none; border: 0; padding: 0; box-shadow: none; }
   .colonnes-rayons { column-count: 2; column-gap: 22px; }
   .jeton { background: none; border-color: #ccc; color: #333; }
+  .article.est-deja { display: none !important; }
 }
