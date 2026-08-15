@@ -5,4 +5,7 @@ data/*.tmp
 # Fichiers de travail de Word sur le document source
 ~$*
 
+# Pages d'essai jetables déposées à côté de index.html
+web/_*.html
+
 .DS_Store
