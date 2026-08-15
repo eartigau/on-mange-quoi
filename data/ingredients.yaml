@@ -1,0 +1,166 @@
+# Nature de chaque ingrédient : à quel rayon d'épicerie il appartient.
+#
+# Les identifiants de rayon sont ceux définis dans meta.yaml. Un ingrédient
+# absent d'ici se retrouve dans « À classer », sur le site comme dans le PDF ;
+# l'onglet « Gérer » de la page web permet de le classer sans ouvrir ce
+# fichier à la main.
+#
+# Le regroupement suit la liste d'épicerie familiale : les bouillons et le vin
+# sont avec les produits laitiers et boissons, les épices avec les huiles, les
+# œufs avec la viande.
+
+rayons_par_ingredient:
+
+  # Légumes frais
+  ail: legumes-frais
+  aneth: legumes-frais
+  avocat: legumes-frais
+  brocoli: legumes-frais
+  carottes: legumes-frais
+  céleri: legumes-frais
+  champignons: legumes-frais
+  concombre: legumes-frais
+  coriandre fraîche: legumes-frais
+  courge butternut: legumes-frais
+  courgettes: legumes-frais
+  échalote française: legumes-frais
+  épinards: legumes-frais
+  gingembre frais: legumes-frais
+  kale: legumes-frais
+  laitue: legumes-frais
+  laitue romaine: legumes-frais
+  menthe fraîche: legumes-frais
+  oignon: legumes-frais
+  oignon rouge: legumes-frais
+  oignons verts: legumes-frais
+  persil: legumes-frais
+  poireaux: legumes-frais
+  poivron jaune: legumes-frais
+  poivron rouge: legumes-frais
+  poivron vert: legumes-frais
+  pommes de terre: legumes-frais
+  salade de chou: legumes-frais
+  tofu ferme: legumes-frais
+  tomates: legumes-frais
+  tomates cerises: legumes-frais
+
+  # Fruits frais
+  citron: fruits-frais
+  lime: fruits-frais
+  oranges: fruits-frais
+
+  # Légumes et plats surgelés
+  boulettes de viande surgelées: surgeles
+  dumplings surgelés: surgeles
+  pâte brisée: surgeles
+  pâte phyllo: surgeles
+  petits pois surgelés: surgeles
+  pierogis surgelés: surgeles
+
+  # Lait, produits laitiers et boissons
+  beurre: laitiers
+  bouillon de bœuf: laitiers
+  bouillon de légumes: laitiers
+  bouillon de poulet: laitiers
+  cheddar râpé: laitiers
+  crème 15%: laitiers
+  crème sure: laitiers
+  feta: laitiers
+  fromage en tranches: laitiers
+  gruyère râpé: laitiers
+  lait: laitiers
+  mozzarella: laitiers
+  parmesan: laitiers
+  ricotta: laitiers
+  tzatziki: laitiers
+  vin blanc: laitiers
+
+  # Pâtisserie et pains
+  croûtons: patisserie-pains
+  farine tout usage: patisserie-pains
+  fécule de maïs: patisserie-pains
+  pains à burger: patisserie-pains
+  pains à hot-dog: patisserie-pains
+  pains pita: patisserie-pains
+  pâte à pizza: patisserie-pains
+  tortillas: patisserie-pains
+
+  # Viande, poissons et œufs
+  bacon: viandes-poissons
+  bœuf haché: viandes-poissons
+  côtes de porc: viandes-poissons
+  crevettes: viandes-poissons
+  escalopes de poulet: viandes-poissons
+  filets de saumon: viandes-poissons
+  jambon: viandes-poissons
+  lardons: viandes-poissons
+  œufs: viandes-poissons
+  pepperoni: viandes-poissons
+  poitrines de poulet: viandes-poissons
+  porc haché: viandes-poissons
+  saucisses hot-dog: viandes-poissons
+  saucisses italiennes: viandes-poissons
+  saucisses merguez: viandes-poissons
+  steak de bœuf: viandes-poissons
+
+  # Riz, pâtes, huiles et épices
+  basilic séché: riz-pates-huiles
+  chapelure: riz-pates-huiles
+  coriandre moulue: riz-pates-huiles
+  cumin: riz-pates-huiles
+  curcuma: riz-pates-huiles
+  estragon: riz-pates-huiles
+  galettes de riz: riz-pates-huiles
+  gnocchi: riz-pates-huiles
+  graines de sésame: riz-pates-huiles
+  huile d'olive: riz-pates-huiles
+  huile de sésame: riz-pates-huiles
+  huile végétale: riz-pates-huiles
+  muscade: riz-pates-huiles
+  origan séché: riz-pates-huiles
+  pâtes à lasagne: riz-pates-huiles
+  pâtes papillon: riz-pates-huiles
+  piment fort broyé: riz-pates-huiles
+  poivre: riz-pates-huiles
+  poudre de chili: riz-pates-huiles
+  quinoa: riz-pates-huiles
+  ras el hanout: riz-pates-huiles
+  riz: riz-pates-huiles
+  riz basmati: riz-pates-huiles
+  semoule de couscous: riz-pates-huiles
+  spaghettis: riz-pates-huiles
+  thym: riz-pates-huiles
+  vermicelles de riz: riz-pates-huiles
+  vinaigre de riz: riz-pates-huiles
+  vinaigrette césar: riz-pates-huiles
+  vinaigrette grecque: riz-pates-huiles
+
+  # Conserves
+  confiture d'airelles: conserves
+  cornichons: conserves
+  haricots rouges en conserve: conserves
+  ketchup: conserves
+  lait de coco: conserves
+  lentilles corail: conserves
+  lentilles sèches: conserves
+  maïs en crème: conserves
+  maïs en grains: conserves
+  mayonnaise: conserves
+  moutarde: conserves
+  moutarde de Dijon: conserves
+  olives noires: conserves
+  pâte de tomate: conserves
+  pois chiches: conserves
+  salsa: conserves
+  sauce aux arachides: conserves
+  sauce soya: conserves
+  sauce tomate: conserves
+  thon en conserve: conserves
+  tomates en conserve: conserves
+
+  # Collations et grignotines
+  chips tortilla: collations
+
+  # Petits-déjeuners
+  miel: dejeuners
+  sirop d'érable: dejeuners

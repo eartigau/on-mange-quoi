@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>On mange quoi ?</title>
+<meta name="description" content="On coche les repas de la semaine, ça sort la liste d'épicerie classée par rayon." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=Outfit:wght@300;400;500;600;700&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css" />
+<link rel="stylesheet" href="app.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <div class="site-banner">
+    <div class="site-banner-inner">
+      <div class="site-banner-text">
+        <h2>On mange quoi&nbsp;?</h2>
+        <p>Les repas de la famille &middot; menu de la semaine et liste d'épicerie</p>
+      </div>
+      <a href="https://eartigau.github.io/" class="home-link">&larr; Home</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">La cuisine de la famille</p>
+    <h1>On mange <span class="surligne">quoi</span>&nbsp;?</h1>
+    <p class="subtitle">
+      On coche les repas qu'on a envie de faire cette semaine, le site compile
+      tous les ingrédients et sort une liste d'épicerie classée dans l'ordre
+      des allées, prête à imprimer.
+    </p>
+    <nav class="tabs" id="onglets">
+      <button type="button" class="tab is-active" data-vue="choisir">Choisir les repas</button>
+      <button type="button" class="tab" data-vue="gerer">Gérer les recettes</button>
+      <span class="mode-pill" id="modePill" title="">…</span>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════ Vue : choisir les repas ══════════ -->
+  <main class="layout" id="vue-choisir">
+
+    <section class="card" id="carte-filtres">
+      <h2>Filtres</h2>
+      <input type="search" id="recherche" class="champ" placeholder="Chercher un plat ou un ingrédient…" autocomplete="off" />
+      <div id="facettes"></div>
+      <button type="button" class="btn btn-fantome btn-bloc" id="viderFiltres">Effacer les filtres</button>
+      <p class="hint" id="compteFiltre"></p>
+    </section>
+
+    <section class="card span-2" id="carte-recettes">
+      <div class="entete-carte">
+        <h2>Les repas</h2>
+        <div class="actions-entete">
+          <button type="button" class="btn btn-fantome btn-mini" id="hasard">Au hasard&nbsp;: 5 repas</button>
+          <button type="button" class="btn btn-fantome btn-mini" id="toutDecocher">Tout décocher</button>
+        </div>
+      </div>
+      <div class="grille-recettes" id="grilleRecettes"></div>
+      <p class="hint" id="messageVide" hidden>Aucun repas ne correspond à ces filtres.</p>
+    </section>
+
+    <section class="card span-3" id="carte-liste">
+      <div class="entete-carte">
+        <h2>La liste d'épicerie</h2>
+        <div class="actions-entete">
+          <button type="button" class="btn btn-primaire" id="btnPdf">Télécharger le PDF</button>
+          <button type="button" class="btn btn-fantome btn-mini" id="btnImprimer">Imprimer</button>
+          <button type="button" class="btn btn-fantome btn-mini" id="btnCopier">Copier le texte</button>
+        </div>
+      </div>
+
+      <div id="menuChoisi"></div>
+      <div class="colonnes-rayons" id="listeRayons"></div>
+      <p class="hint" id="listeVide">Rien de coché pour l'instant. Choisissez des repas ci-dessus et la liste se compile toute seule.</p>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════════ Vue : gérer ══════════════════════ -->
+  <main class="layout" id="vue-gerer" hidden>
+
+    <section class="card span-2" id="carte-edition">
+      <div class="entete-carte">
+        <h2>Recettes</h2>
+        <div class="actions-entete">
+          <select id="choixRecette" class="champ champ-inline"></select>
+          <button type="button" class="btn btn-fantome btn-mini" id="nouvelleRecette">+ Nouvelle</button>
+        </div>
+      </div>
+
+      <form id="formRecette" autocomplete="off">
+        <label class="etiquette" for="fNom">Nom du plat</label>
+        <input type="text" id="fNom" class="champ" required />
+
+        <label class="etiquette" for="fPortions">Portions</label>
+        <input type="number" id="fPortions" class="champ champ-court" min="1" max="30" step="1" value="4" />
+
+        <span class="etiquette">Tags</span>
+        <div id="fTags" class="zone-tags"></div>
+
+        <label class="etiquette" for="fIngredients">Ingrédients <span class="doux">(un par ligne)</span></label>
+        <textarea id="fIngredients" class="champ zone-texte" rows="12" spellcheck="false"></textarea>
+        <datalist id="listeIngredientsConnus"></datalist>
+        <p class="hint" id="apercuNouveaux"></p>
+
+        <label class="etiquette" for="fNote">Note <span class="doux">(optionnel)</span></label>
+        <input type="text" id="fNote" class="champ" />
+
+        <div class="barre-boutons">
+          <button type="submit" class="btn btn-primaire">Enregistrer la recette</button>
+          <button type="button" class="btn btn-danger btn-mini" id="supprimerRecette">Supprimer</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="carte-ingredients">
+      <h2>Rayon de chaque ingrédient</h2>
+      <p class="hint" id="alerteNonClasses"></p>
+      <input type="search" id="rechercheIngredient" class="champ" placeholder="Chercher un ingrédient…" autocomplete="off" />
+      <div class="liste-ingredients" id="listeIngredients"></div>
+    </section>
+
+    <section class="card span-3" id="carte-sauvegarde">
+      <h2>Enregistrer</h2>
+      <p class="hint" id="explicationSauvegarde"></p>
+      <div class="barre-boutons">
+        <button type="button" class="btn btn-primaire" id="btnSauver">Enregistrer les fichiers</button>
+        <button type="button" class="btn btn-fantome btn-mini" id="btnTelechargerRecettes">Télécharger recettes.yaml</button>
+        <button type="button" class="btn btn-fantome btn-mini" id="btnTelechargerIngredients">Télécharger ingredients.yaml</button>
+      </div>
+      <p class="hint" id="etatSauvegarde"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <span id="statsPied"></span><br />
+      <a href="https://eartigau.github.io/" target="_blank" rel="noopener">More tools</a>
+    </p>
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="lib/js-yaml.min.js"></script>
+  <script src="lib/jspdf.umd.min.js"></script>
+  <script src="lib/polices.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

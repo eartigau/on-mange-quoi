@@ -1,0 +1,281 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   On mange quoi ? Base festive.
+
+   Ambiance : terrasse, apéro, nappe à carreaux, store rayé de bistrot.
+   Fond crème, accents tomate / olive / soleil / raisin, titres en Fraunces,
+   texte en Outfit, petites touches manuscrites en Caveat.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Fonds */
+  --creme:    #fff7ea;
+  --creme2:   #ffeacf;
+  --carte:    #fffdf9;
+
+  /* Encres */
+  --encre:    #3c2a1e;
+  --doux:     #8d7261;
+
+  /* Accents */
+  --tomate:   #e4572e;
+  --tomate-clair: #ff7a52;
+  --olive:    #6f9a3f;
+  --soleil:   #f4ac1a;
+  --raisin:   #a3468c;
+  --ciel:     #3d9bb5;
+
+  --ligne:    rgba(60, 42, 30, 0.14);
+  --ombre:    0 10px 26px rgba(120, 74, 40, 0.1);
+  --ombre-forte: 0 16px 38px rgba(120, 74, 40, 0.18);
+
+  --rond:     20px;
+}
+
+* { box-sizing: border-box; }
+
+/* Une règle d'auteur comme « .layout { display: grid } » l'emporte sinon sur
+   le display:none par défaut de l'attribut hidden, et la vue masquée reste
+   visible. */
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Outfit", "Avenir Next", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--encre);
+  background-color: var(--creme);
+  background-image:
+    radial-gradient(1100px 620px at 12% -8%, rgba(244, 172, 26, 0.22), transparent 62%),
+    radial-gradient(900px 560px at 92% 4%, rgba(228, 87, 46, 0.16), transparent 60%),
+    linear-gradient(175deg, var(--creme) 0%, var(--creme2) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Deux taches floues qui bougent doucement : ça respire, ça fait vivant. */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb-a {
+  width: 480px; height: 480px;
+  top: -140px; left: -120px;
+  background: var(--soleil);
+  animation: flotte 17s ease-in-out infinite;
+}
+
+.orb-b {
+  width: 540px; height: 540px;
+  bottom: -200px; right: -160px;
+  background: var(--olive);
+  opacity: 0.3;
+  animation: flotte 21s ease-in-out infinite reverse;
+}
+
+@keyframes flotte {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(38px, -26px) scale(1.09); }
+}
+
+/* ── Typographie ─────────────────────────────────────────────────────── */
+
+h1, h2, h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  letter-spacing: -0.015em;
+  color: var(--encre);
+}
+
+h1 {
+  margin: 6px 0 12px;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 0.98;
+}
+
+h2 { margin: 0 0 10px; font-size: 1.22rem; }
+h3 { margin: 0 0 8px; font-size: 1rem; }
+
+a { color: var(--tomate); text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline wavy; text-underline-offset: 3px; }
+
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+/* ── Bannière : un store de bistrot, rayé, à festons ─────────────────── */
+
+.site-banner {
+  position: relative;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    100deg,
+    var(--tomate) 0 46px,
+    var(--tomate-clair) 46px 92px);
+  box-shadow: 0 6px 22px rgba(180, 70, 35, 0.28);
+}
+
+/* Les festons qui pendent sous le store. */
+.site-banner::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -11px;
+  height: 12px;
+  background: inherit;
+  -webkit-mask: radial-gradient(circle 11px at 11px 0, #000 98%, transparent 100%) 0 0 / 22px 12px repeat-x;
+          mask: radial-gradient(circle 11px at 11px 0, #000 98%, transparent 100%) 0 0 / 22px 12px repeat-x;
+}
+
+.site-banner-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.site-banner-text h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-shadow: 0 2px 6px rgba(120, 40, 15, 0.35);
+}
+
+.site-banner-text p {
+  margin: 1px 0 0;
+  color: rgba(255, 246, 235, 0.92);
+  font-size: 0.85rem;
+  font-weight: 300;
+}
+
+.home-link {
+  margin-left: auto;
+  flex: none;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 6px 16px;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.home-link:hover {
+  background: #fff;
+  color: var(--tomate);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 20px 18px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: "Caveat", cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--tomate);
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+
+/* Le surlignage jaune tracé à la main derrière un bout du titre. */
+.surligne {
+  background: linear-gradient(transparent 58%, rgba(244, 172, 26, 0.55) 58%);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+.subtitle {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--doux);
+  font-size: 1.02rem;
+  font-weight: 300;
+}
+
+/* ── Grille et cartes ────────────────────────────────────────────────── */
+
+.layout {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 20px 30px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.card {
+  background: var(--carte);
+  border: 1.5px solid var(--ligne);
+  border-radius: var(--rond);
+  padding: 20px;
+  box-shadow: var(--ombre);
+}
+
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+
+.hint {
+  margin: 10px 0 0;
+  color: var(--doux);
+  font-size: 0.88rem;
+  font-weight: 300;
+}
+
+/* ── Pied de page ────────────────────────────────────────────────────── */
+
+.footer {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px 20px 34px;
+  color: var(--doux);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+/* ── Adaptatif ───────────────────────────────────────────────────────── */
+
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr 1fr; }
+  .span-2, .span-3 { grid-column: span 2; }
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .span-2, .span-3 { grid-column: span 1; }
+  .site-banner-text p { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto; }
+}

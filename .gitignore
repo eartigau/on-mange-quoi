@@ -1,0 +1,8 @@
+# Copies de sauvegarde faites par le serveur local avant chaque écriture
+data/*.bak
+data/*.tmp
+
+# Fichiers de travail de Word sur le document source
+~$*
+
+.DS_Store

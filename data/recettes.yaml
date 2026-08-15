@@ -1,0 +1,682 @@
+# Les repas de la famille.
+#
+# La liste des plats vient du document « Repas .docx » (Salades, Soupes,
+# Végétarien, Viande). Les listes d'ingrédients ont été remplies à partir des
+# versions classiques de chaque plat : à relire et à ajuster au goût de la
+# maison, c'est le fichier fait pour ça.
+#
+# Chaque recette :
+#   nom         : le titre affiché sur le site et dans le menu du PDF
+#   tags        : les mots-clés servant aux filtres (voir facettes/meta.yaml)
+#   portions    : pour combien de personnes, à titre indicatif
+#   ingredients : un ingrédient par ligne. Le nom écrit ici doit correspondre à
+#                 une entrée de ingredients.yaml pour tomber dans le bon rayon,
+#                 sinon il finit dans « À classer ».
+#   note        : optionnel, le truc de famille à ne pas oublier
+
+recettes:
+
+  - nom: Salade tacos
+    tags: [salade, été, en semaine, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - laitue romaine
+      - bœuf haché
+      - tomates
+      - oignon rouge
+      - avocat
+      - cheddar râpé
+      - crème sure
+      - chips tortilla
+      - salsa
+      - poudre de chili
+      - cumin
+
+  - nom: Salade grecque
+    tags: [salade, été, express, végétarien]
+    portions: 4
+    ingredients:
+      - concombre
+      - tomates
+      - oignon rouge
+      - poivron vert
+      - olives noires
+      - feta
+      - huile d'olive
+      - origan séché
+      - citron
+
+  - nom: Salade pâtes et poivrons
+    tags: [salade, été, en semaine, végétarien, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - pâtes papillon
+      - poivron rouge
+      - poivron jaune
+      - oignon rouge
+      - olives noires
+      - feta
+      - vinaigrette grecque
+      - persil
+
+  - nom: Salade de crevette
+    tags: [salade, été, express, poisson]
+    portions: 4
+    ingredients:
+      - crevettes
+      - laitue
+      - avocat
+      - concombre
+      - tomates cerises
+      - mayonnaise
+      - citron
+      - aneth
+
+  - nom: Taboulé
+    tags: [salade, été, express, végétarien, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - semoule de couscous
+      - persil
+      - menthe fraîche
+      - tomates
+      - concombre
+      - oignons verts
+      - citron
+      - huile d'olive
+
+  - nom: Salade de quinoa
+    tags: [salade, été, express, végétarien, sans gluten, restes pour la boîte à lunch]
+    portions: 4
+    ingredients:
+      - quinoa
+      - concombre
+      - tomates cerises
+      - pois chiches
+      - feta
+      - persil
+      - menthe fraîche
+      - citron
+      - huile d'olive
+
+  - nom: Salade césar
+    tags: [salade, toute l'année, express, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - laitue romaine
+      - bacon
+      - parmesan
+      - croûtons
+      - vinaigrette césar
+      - citron
+
+  - nom: Soupe brocoli
+    tags: [soupe, hiver, express, végétarien, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - brocoli
+      - pommes de terre
+      - oignon
+      - beurre
+      - bouillon de légumes
+      - crème 15%
+      - muscade
+
+  - nom: Soupe aux carottes
+    tags: [soupe, automne, express, végétarien, sans gluten]
+    portions: 4
+    ingredients:
+      - carottes
+      - oignon
+      - gingembre frais
+      - bouillon de légumes
+      - lait de coco
+      - cumin
+      - huile d'olive
+
+  - nom: Soupe aux courges
+    tags: [soupe, automne, mijoté, végétarien]
+    portions: 6
+    ingredients:
+      - courge butternut
+      - oignon
+      - pommes de terre
+      - beurre
+      - bouillon de légumes
+      - crème 15%
+      - muscade
+    note: Rôtir la courge au four avant de la mettre en soupe, c'est plus sucré.
+
+  - nom: Soupe aux poireaux
+    tags: [soupe, hiver, express, végétarien, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - poireaux
+      - pommes de terre
+      - oignon
+      - beurre
+      - bouillon de légumes
+      - crème 15%
+    note: Passer au mélangeur à main, c'est bien meilleur velouté.
+
+  - nom: Soupe aux épinards
+    tags: [soupe, printemps, express, végétarien]
+    portions: 4
+    ingredients:
+      - épinards
+      - pommes de terre
+      - oignon
+      - ail
+      - bouillon de légumes
+      - crème 15%
+      - muscade
+
+  - nom: Soupe aux lentilles et jambon
+    tags: [soupe, hiver, mijoté, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - lentilles sèches
+      - jambon
+      - carottes
+      - céleri
+      - oignon
+      - ail
+      - bouillon de poulet
+      - tomates en conserve
+      - thym
+
+  - nom: Soupe Dahl
+    tags: [soupe, hiver, mijoté, végétarien, sans gluten, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - lentilles corail
+      - lait de coco
+      - tomates en conserve
+      - oignon
+      - ail
+      - gingembre frais
+      - curcuma
+      - cumin
+      - coriandre moulue
+      - coriandre fraîche
+
+  - nom: Tofu mariné
+    tags: [plat principal, toute l'année, en semaine, végétarien]
+    portions: 4
+    ingredients:
+      - tofu ferme
+      - sauce soya
+      - sirop d'érable
+      - ail
+      - gingembre frais
+      - huile de sésame
+      - graines de sésame
+      - riz
+      - oignons verts
+
+  - nom: Tofu à l'orange
+    tags: [plat principal, toute l'année, en semaine, végétarien]
+    portions: 4
+    ingredients:
+      - tofu ferme
+      - oranges
+      - sauce soya
+      - fécule de maïs
+      - gingembre frais
+      - ail
+      - miel
+      - huile végétale
+      - brocoli
+      - riz
+
+  - nom: Patate écrasée + fromage
+    tags: [plat principal, hiver, express, végétarien, plaît aux enfants, sans gluten]
+    portions: 4
+    ingredients:
+      - pommes de terre
+      - beurre
+      - lait
+      - cheddar râpé
+      - oignons verts
+
+  - nom: Falafel
+    tags: [plat principal, toute l'année, réception, végétarien]
+    portions: 4
+    ingredients:
+      - pois chiches
+      - persil
+      - coriandre fraîche
+      - oignon
+      - ail
+      - cumin
+      - farine tout usage
+      - huile végétale
+      - pains pita
+      - tzatziki
+      - tomates
+      - laitue
+
+  - nom: Spanakopitas
+    tags: [plat principal, toute l'année, réception, végétarien, four]
+    portions: 6
+    ingredients:
+      - épinards
+      - feta
+      - pâte phyllo
+      - oignon
+      - œufs
+      - aneth
+      - beurre
+      - muscade
+
+  - nom: Rouleaux de printemps
+    tags: [plat principal, été, réception, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - galettes de riz
+      - vermicelles de riz
+      - crevettes
+      - laitue
+      - carottes
+      - concombre
+      - menthe fraîche
+      - coriandre fraîche
+      - sauce aux arachides
+
+  - nom: Lasagne végé
+    tags: [plat principal, toute l'année, réception, végétarien, four, restes pour la boîte à lunch]
+    portions: 8
+    ingredients:
+      - pâtes à lasagne
+      - épinards
+      - courgettes
+      - ricotta
+      - mozzarella
+      - parmesan
+      - sauce tomate
+      - oignon
+      - ail
+      - huile d'olive
+
+  - nom: Quiche aux poireaux
+    tags: [plat principal, automne, four, végétarien, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - pâte brisée
+      - poireaux
+      - œufs
+      - crème 15%
+      - gruyère râpé
+      - beurre
+      - muscade
+
+  - nom: Couscous saucisse
+    tags: [plat principal, hiver, mijoté, réception]
+    portions: 6
+    ingredients:
+      - semoule de couscous
+      - saucisses merguez
+      - carottes
+      - courgettes
+      - pois chiches
+      - oignon
+      - tomates en conserve
+      - bouillon de poulet
+      - ras el hanout
+
+  - nom: Saumon & purée
+    tags: [plat principal, toute l'année, express, poisson, sans gluten]
+    portions: 4
+    ingredients:
+      - filets de saumon
+      - pommes de terre
+      - beurre
+      - lait
+      - citron
+      - aneth
+
+  - nom: Légumes farcis
+    tags: [plat principal, été, four]
+    portions: 4
+    ingredients:
+      - poivron rouge
+      - courgettes
+      - tomates
+      - bœuf haché
+      - riz
+      - oignon
+      - ail
+      - persil
+      - huile d'olive
+
+  - nom: Dumpling
+    tags: [plat principal, toute l'année, express, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - dumplings surgelés
+      - sauce soya
+      - vinaigre de riz
+      - huile de sésame
+      - oignons verts
+      - brocoli
+
+  - nom: Pierrogis
+    tags: [plat principal, hiver, express, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - pierogis surgelés
+      - oignon
+      - beurre
+      - crème sure
+      - bacon
+
+  - nom: Boulette Ikea
+    tags: [plat principal, hiver, express, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - boulettes de viande surgelées
+      - crème 15%
+      - bouillon de bœuf
+      - moutarde de Dijon
+      - confiture d'airelles
+      - pommes de terre
+      - lait
+      - beurre
+
+  - nom: Boulette asiatique
+    tags: [plat principal, toute l'année, en semaine, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - porc haché
+      - chapelure
+      - œufs
+      - gingembre frais
+      - ail
+      - oignons verts
+      - sauce soya
+      - miel
+      - huile de sésame
+      - riz
+
+  - nom: Saumon mariné à la sauce soya
+    tags: [plat principal, toute l'année, express, poisson]
+    portions: 4
+    ingredients:
+      - filets de saumon
+      - sauce soya
+      - sirop d'érable
+      - ail
+      - gingembre frais
+      - huile de sésame
+      - riz
+      - brocoli
+
+  - nom: Burger
+    tags: [plat principal, été, express, plaît aux enfants, barbecue]
+    portions: 4
+    ingredients:
+      - bœuf haché
+      - pains à burger
+      - fromage en tranches
+      - laitue
+      - tomates
+      - oignon rouge
+      - cornichons
+      - ketchup
+      - moutarde
+      - mayonnaise
+      - salade de chou
+
+  - nom: Hot dog
+    tags: [plat principal, été, express, plaît aux enfants, barbecue]
+    portions: 4
+    ingredients:
+      - saucisses hot-dog
+      - pains à hot-dog
+      - moutarde
+      - ketchup
+      - oignon
+      - salade de chou
+
+  - nom: Quiche lorraine
+    tags: [plat principal, automne, four, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - pâte brisée
+      - lardons
+      - œufs
+      - crème 15%
+      - gruyère râpé
+      - muscade
+
+  - nom: Lasagne
+    tags: [plat principal, hiver, réception, four, restes pour la boîte à lunch]
+    portions: 8
+    ingredients:
+      - pâtes à lasagne
+      - bœuf haché
+      - tomates en conserve
+      - pâte de tomate
+      - mozzarella
+      - parmesan
+      - lait
+      - beurre
+      - farine tout usage
+      - oignon
+      - ail
+      - origan séché
+
+  - nom: Gnocchi & saucisse
+    tags: [plat principal, automne, express]
+    portions: 4
+    ingredients:
+      - gnocchi
+      - saucisses italiennes
+      - sauce tomate
+      - épinards
+      - parmesan
+      - ail
+      - huile d'olive
+
+  - nom: Chili con carne
+    tags: [plat principal, hiver, mijoté, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - bœuf haché
+      - haricots rouges en conserve
+      - tomates en conserve
+      - poivron rouge
+      - oignon
+      - ail
+      - poudre de chili
+      - cumin
+      - crème sure
+      - cheddar râpé
+
+  - nom: Courgette et steak au cumin
+    tags: [plat principal, été, express, sans gluten]
+    portions: 4
+    ingredients:
+      - steak de bœuf
+      - courgettes
+      - cumin
+      - ail
+      - huile d'olive
+      - citron
+      - riz
+
+  - nom: Poulet et petits pois noix de coco
+    tags: [plat principal, toute l'année, en semaine, sans gluten]
+    portions: 4
+    ingredients:
+      - poitrines de poulet
+      - petits pois surgelés
+      - lait de coco
+      - oignon
+      - ail
+      - gingembre frais
+      - curcuma
+      - riz basmati
+      - coriandre fraîche
+
+  - nom: Pain de viande
+    tags: [plat principal, hiver, four, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - bœuf haché
+      - porc haché
+      - chapelure
+      - œufs
+      - oignon
+      - ail
+      - ketchup
+      - moutarde de Dijon
+      - thym
+      - pommes de terre
+
+  - nom: Spaghetti bolognaise
+    tags: [plat principal, toute l'année, mijoté, plaît aux enfants, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - spaghettis
+      - bœuf haché
+      - tomates en conserve
+      - pâte de tomate
+      - carottes
+      - céleri
+      - oignon
+      - ail
+      - origan séché
+      - basilic séché
+      - huile d'olive
+      - parmesan
+
+  - nom: Pâtes carbonara
+    tags: [plat principal, toute l'année, express, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - spaghettis
+      - lardons
+      - œufs
+      - parmesan
+      - crème 15%
+      - ail
+      - poivre
+
+  - nom: Pâtes au thon et brocoli
+    tags: [plat principal, toute l'année, express, poisson, restes pour la boîte à lunch]
+    portions: 4
+    ingredients:
+      - pâtes papillon
+      - thon en conserve
+      - brocoli
+      - ail
+      - huile d'olive
+      - citron
+      - parmesan
+      - piment fort broyé
+
+  - nom: Patates au four, kale et côte de porc
+    tags: [plat principal, automne, four, sans gluten]
+    portions: 4
+    ingredients:
+      - côtes de porc
+      - pommes de terre
+      - kale
+      - ail
+      - huile d'olive
+      - moutarde de Dijon
+      - thym
+
+  - nom: Maïs et viande
+    tags: [plat principal, hiver, en semaine, plaît aux enfants]
+    portions: 6
+    ingredients:
+      - bœuf haché
+      - maïs en crème
+      - maïs en grains
+      - pommes de terre
+      - oignon
+      - beurre
+      - lait
+    note: Un peu de paprika sur le dessus avant d'enfourner.
+
+  - nom: Tacos
+    tags: [plat principal, été, en semaine, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - tortillas
+      - bœuf haché
+      - laitue
+      - tomates
+      - oignon rouge
+      - avocat
+      - cheddar râpé
+      - crème sure
+      - lime
+      - coriandre fraîche
+      - poudre de chili
+      - cumin
+
+  - nom: Crêpe salée
+    tags: [plat principal, toute l'année, en semaine, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - farine tout usage
+      - œufs
+      - lait
+      - beurre
+      - jambon
+      - gruyère râpé
+      - champignons
+      - crème 15%
+
+  - nom: Escalope de poulet à la moutarde
+    tags: [plat principal, toute l'année, express]
+    portions: 4
+    ingredients:
+      - escalopes de poulet
+      - moutarde de Dijon
+      - crème 15%
+      - échalote française
+      - vin blanc
+      - beurre
+      - estragon
+      - riz
+
+  - nom: Quiche au thon
+    tags: [plat principal, toute l'année, four, poisson, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - pâte brisée
+      - thon en conserve
+      - œufs
+      - crème 15%
+      - tomates
+      - gruyère râpé
+      - moutarde de Dijon
+
+  - nom: Pizza
+    tags: [plat principal, toute l'année, four, plaît aux enfants]
+    portions: 4
+    ingredients:
+      - pâte à pizza
+      - sauce tomate
+      - mozzarella
+      - pepperoni
+      - champignons
+      - poivron vert
+      - olives noires
+      - origan séché
+
+  - nom: Quiche aux épinards et jambon
+    tags: [plat principal, printemps, four, restes pour la boîte à lunch]
+    portions: 6
+    ingredients:
+      - pâte brisée
+      - épinards
+      - jambon
+      - œufs
+      - crème 15%
+      - gruyère râpé
+      - muscade

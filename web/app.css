@@ -1,0 +1,525 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   On mange quoi ? Composants de l'application.
+   La palette, les polices et les cartes viennent de theme.css.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Onglets ─────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.tab {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--encre);
+  background: #fff;
+  border: 2px solid var(--ligne);
+  border-radius: 999px;
+  padding: 9px 22px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(60, 42, 30, 0.1);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.tab:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(60, 42, 30, 0.12); }
+.tab:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(60, 42, 30, 0.12); }
+
+.tab.is-active {
+  color: #fff;
+  background: var(--tomate);
+  border-color: var(--tomate);
+  box-shadow: 0 3px 0 #b23e1f;
+}
+
+.mode-pill {
+  margin-left: auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--doux);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid var(--ligne);
+  border-radius: 999px;
+  padding: 5px 13px;
+  white-space: nowrap;
+}
+
+.mode-pill.mode-local { color: #4d7a24; border-color: rgba(111, 154, 63, 0.5); background: rgba(111, 154, 63, 0.12); }
+
+/* ── Champs ──────────────────────────────────────────────────────────── */
+
+.champ {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--encre);
+  background: #fffdf7;
+  border: 2px solid var(--ligne);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 13px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.champ:focus {
+  outline: none;
+  border-color: var(--tomate);
+  box-shadow: 0 0 0 4px rgba(228, 87, 46, 0.14);
+}
+
+.champ::placeholder { color: #b9a292; }
+
+.champ-court { width: 110px; }
+
+.champ-inline {
+  width: auto;
+  max-width: 250px;
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  padding: 7px 11px;
+}
+
+.zone-texte {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.etiquette {
+  display: block;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--doux);
+  margin-bottom: 6px;
+}
+
+.doux { text-transform: none; letter-spacing: 0; font-weight: 300; }
+
+/* ── Boutons ─────────────────────────────────────────────────────────── */
+
+.btn {
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--encre);
+  background: #fff;
+  border: 2px solid var(--ligne);
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(60, 42, 30, 0.1);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(60, 42, 30, 0.12); }
+.btn:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(60, 42, 30, 0.12); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-primaire {
+  color: #fff;
+  background: var(--tomate);
+  border-color: var(--tomate);
+  box-shadow: 0 3px 0 #b23e1f;
+}
+
+.btn-primaire:hover:not(:disabled) { background: var(--tomate-clair); border-color: var(--tomate-clair); box-shadow: 0 5px 0 #b23e1f; }
+.btn-primaire:active:not(:disabled) { box-shadow: 0 1px 0 #b23e1f; }
+
+.btn-fantome { background: rgba(255, 255, 255, 0.75); }
+
+.btn-danger { color: #b3341c; border-color: rgba(179, 52, 28, 0.3); }
+.btn-danger:hover { background: #fff0ec; border-color: rgba(179, 52, 28, 0.6); }
+
+.btn-mini { font-size: 0.83rem; padding: 8px 16px; }
+
+.btn-bloc { width: 100%; margin-top: 8px; }
+
+.barre-boutons { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 18px; }
+
+/* ── En-têtes de carte ───────────────────────────────────────────────── */
+
+.entete-carte {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  margin-bottom: 15px;
+}
+
+.entete-carte h2 { margin: 0; }
+
+.actions-entete { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+
+/* ── Filtres ─────────────────────────────────────────────────────────── */
+
+.facette { margin-bottom: 16px; }
+
+.facette-titre {
+  font-family: "Caveat", cursive;
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: var(--raisin);
+  margin: 0 0 7px;
+}
+
+.pastilles { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--encre);
+  background: #fff;
+  border: 2px solid var(--ligne);
+  border-radius: 999px;
+  padding: 5px 13px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s, background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pastille input { display: none; }
+.pastille:hover { transform: translateY(-1px) rotate(-1.5deg); border-color: var(--soleil); }
+
+.pastille.is-on {
+  color: #fff;
+  background: var(--olive);
+  border-color: var(--olive);
+  font-weight: 600;
+}
+
+.pastille.is-vide { opacity: 0.35; }
+
+/* ── Tuiles de recettes ──────────────────────────────────────────────── */
+
+.grille-recettes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(218px, 1fr));
+  gap: 12px;
+}
+
+.tuile {
+  position: relative;
+  display: block;
+  border: 2px solid var(--ligne);
+  border-radius: 16px;
+  padding: 13px 13px 11px 40px;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(60, 42, 30, 0.07);
+  transition: transform 0.14s cubic-bezier(0.34, 1.6, 0.64, 1), box-shadow 0.14s, border-color 0.15s, background 0.15s;
+}
+
+.tuile:hover {
+  transform: translateY(-3px) rotate(-0.7deg);
+  box-shadow: 0 8px 0 rgba(60, 42, 30, 0.09);
+  border-color: var(--soleil);
+}
+
+.tuile input { position: absolute; opacity: 0; pointer-events: none; }
+
+/* La case à cocher dessinée à la main. */
+.tuile::before {
+  content: "";
+  position: absolute;
+  left: 13px; top: 14px;
+  width: 18px; height: 18px;
+  border: 2px solid #d7c3b2;
+  border-radius: 6px;
+  background: #fffaf2;
+  transition: background 0.15s, border-color 0.15s, transform 0.18s cubic-bezier(0.34, 1.8, 0.64, 1);
+}
+
+.tuile.is-on {
+  border-color: var(--tomate);
+  background: #fff3ee;
+  box-shadow: 0 3px 0 rgba(228, 87, 46, 0.28);
+  transform: rotate(-0.5deg);
+}
+
+.tuile.is-on:hover { transform: translateY(-3px) rotate(-1.2deg); }
+
+.tuile.is-on::before {
+  background: var(--tomate);
+  border-color: var(--tomate);
+  transform: scale(1.08);
+}
+
+.tuile.is-on::after {
+  content: "";
+  position: absolute;
+  left: 19.5px; top: 17.5px;
+  width: 5px; height: 10px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(43deg);
+}
+
+.tuile-nom {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.tuile-meta {
+  margin-top: 6px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--doux);
+}
+
+.tuile-tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+
+.mini-tag {
+  font-size: 0.67rem;
+  font-weight: 500;
+  color: var(--doux);
+  background: #fdf3e6;
+  border: 1px solid rgba(60, 42, 30, 0.1);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ── Menu retenu ─────────────────────────────────────────────────────── */
+
+.menu-choisi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 2px dashed var(--ligne);
+}
+
+.jeton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: #8f3416;
+  background: #ffeee8;
+  border: 2px solid rgba(228, 87, 46, 0.35);
+  border-radius: 999px;
+  padding: 5px 9px 5px 15px;
+  animation: pop 0.22s cubic-bezier(0.34, 1.7, 0.64, 1);
+}
+
+@keyframes pop {
+  from { transform: scale(0.82); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.jeton button {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  color: #c8613f;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0 3px;
+}
+
+.jeton button:hover { color: #a3210b; transform: scale(1.25); }
+
+/* ── Liste par rayon ─────────────────────────────────────────────────── */
+
+.colonnes-rayons { column-count: 3; column-gap: 28px; }
+
+.rayon {
+  break-inside: avoid;
+  margin: 0 0 20px;
+  --teinte: var(--tomate);
+}
+
+.rayon-titre {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  padding-bottom: 7px;
+  border-bottom: 2px solid color-mix(in srgb, var(--teinte) 35%, transparent);
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teinte);
+}
+
+.rayon-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  flex: none;
+  font-size: 0.95rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--teinte) 16%, #fff);
+  border: 1.5px solid color-mix(in srgb, var(--teinte) 30%, transparent);
+}
+
+.rayon-titre .compte {
+  margin-left: auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+  font-weight: 400;
+  color: var(--doux);
+}
+
+.rayon ul { list-style: none; margin: 0; padding: 0; }
+
+.rayon li {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.35;
+}
+
+/* Une petite case vide devant chaque article, comme sur un vrai bout de papier. */
+.rayon li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 4px;
+  width: 12px; height: 12px;
+  border: 1.5px solid #d0bcab;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.ingredient-nom { font-size: 0.95rem; font-weight: 500; }
+
+.ingredient-source {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--doux);
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* ── Onglet gérer ────────────────────────────────────────────────────── */
+
+.zone-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 15px; }
+
+#apercuNouveaux:not(:empty) { margin-bottom: 15px; }
+
+.liste-ingredients { max-height: 620px; overflow-y: auto; padding-right: 5px; }
+
+.ligne-ingredient {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(60, 42, 30, 0.08);
+}
+
+.ligne-ingredient .nom {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ligne-ingredient select {
+  font-family: inherit;
+  font-size: 0.79rem;
+  color: var(--encre);
+  background: #fffdf7;
+  border: 1.5px solid var(--ligne);
+  border-radius: 9px;
+  padding: 5px 8px;
+  max-width: 172px;
+}
+
+.ligne-ingredient.non-classe .nom { color: #b3341c; font-weight: 600; }
+.ligne-ingredient.non-classe select { border-color: rgba(228, 87, 46, 0.55); }
+
+.alerte {
+  color: #8f3416;
+  background: #fff1e8;
+  border: 2px solid rgba(228, 87, 46, 0.28);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.86rem;
+  font-weight: 400;
+}
+
+/* ── Toast et confettis ──────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--encre);
+  color: #fff7ea;
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--ombre-forte);
+  animation: monte 0.25s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+
+@keyframes monte {
+  from { transform: translate(-50%, 18px); opacity: 0; }
+  to   { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.toast.toast-erreur { background: #a3210b; }
+
+.confetti {
+  position: fixed;
+  top: -12px;
+  width: 9px;
+  height: 14px;
+  z-index: 80;
+  pointer-events: none;
+  border-radius: 2px;
+  animation: tombe 1.7s cubic-bezier(0.3, 0.6, 0.5, 1) forwards;
+}
+
+@keyframes tombe {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── Adaptatif ───────────────────────────────────────────────────────── */
+
+@media (max-width: 980px) { .colonnes-rayons { column-count: 2; } }
+
+@media (max-width: 720px) {
+  .colonnes-rayons { column-count: 1; }
+  .mode-pill { margin-left: 0; }
+  .champ-inline { max-width: 100%; }
+}
+
+/* ── Impression : que la liste, sur du blanc ─────────────────────────── */
+
+@media print {
+  .bg-orb, .site-banner, .tabs, .footer, .toast, .confetti,
+  #carte-filtres, #carte-recettes, #vue-gerer,
+  .actions-entete, .jeton button { display: none !important; }
+
+  body { background: #fff !important; }
+  .hero { padding: 0 0 10px; }
+  .hero h1 { font-size: 2rem; }
+  .eyebrow, .subtitle { display: none; }
+  .layout { display: block; padding: 0; }
+  .card { background: none; border: 0; padding: 0; box-shadow: none; }
+  .colonnes-rayons { column-count: 2; column-gap: 22px; }
+  .jeton { background: none; border-color: #ccc; color: #333; }
+}

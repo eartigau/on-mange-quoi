@@ -1,0 +1,67 @@
+# Méta-données du site « On mange quoi ? »
+#
+# rayons   : les catégories d'ingrédients, DANS L'ORDRE où on les veut sur la
+#            liste d'épicerie (l'ordre des allées, pas l'ordre alphabétique).
+#            Repris de la liste d'épicerie familiale du document « repas ».
+# facettes : les groupes de tags servant à filtrer les recettes. Un tag qui
+#            n'apparaît dans aucune facette reste valide, il se retrouve
+#            simplement dans « Autres tags » sur la page.
+
+rayons:
+  - id: legumes-frais
+    nom: Légumes frais
+    icone: 🥬
+  - id: fruits-frais
+    nom: Fruits frais
+    icone: 🍎
+  - id: surgeles
+    nom: Légumes et plats surgelés
+    icone: ❄️
+  - id: laitiers
+    nom: Lait, produits laitiers et boissons
+    icone: 🧀
+  - id: patisserie-pains
+    nom: Pâtisserie et pains
+    icone: 🥖
+  - id: viandes-poissons
+    nom: Viande, poissons et œufs
+    icone: 🍗
+  - id: riz-pates-huiles
+    nom: Riz, pâtes, huiles et épices
+    icone: 🍝
+  - id: conserves
+    nom: Conserves
+    icone: 🥫
+  - id: collations
+    nom: Collations et grignotines
+    icone: 🥨
+  - id: dejeuners
+    nom: Petits-déjeuners
+    icone: 🥣
+  - id: entretien
+    nom: Soins et nettoyage
+    icone: 🧼
+  - id: autre
+    nom: À classer
+    icone: ❓
+
+facettes:
+  - id: type
+    nom: Type de plat
+    tags: [soupe, salade, plat principal, accompagnement, dessert]
+  - id: saison
+    nom: Saison
+    tags: [toute l'année, printemps, été, automne, hiver]
+  - id: effort
+    nom: Effort
+    tags: [express, en semaine, mijoté, réception]
+  - id: particularites
+    nom: Particularités
+    tags:
+      - végétarien
+      - poisson
+      - plaît aux enfants
+      - restes pour la boîte à lunch
+      - sans gluten
+      - four
+      - barbecue
