@@ -407,8 +407,8 @@ function rendreListe() {
       const li = creer('li');
       const etiquette = creer('label', 'article' + (deja ? ' est-deja' : ''));
       etiquette.title = deja
-        ? 'On en a déjà : décocher pour le remettre sur la liste'
-        : "On en a déjà à la maison ? Cocher pour l'écarter de la liste";
+        ? "On en a déjà, il ne part pas sur la liste. Cliquer pour l'y remettre."
+        : "Sur la liste. Cliquer si on en a déjà à la maison.";
 
       const boite = creer('input');
       boite.type = 'checkbox';

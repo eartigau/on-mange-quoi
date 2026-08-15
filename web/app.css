@@ -369,37 +369,35 @@
 .article {
   position: relative;
   display: block;
-  padding-left: 20px;
+  padding-left: 22px;
   line-height: 1.35;
   cursor: pointer;
 }
 
 .article input { position: absolute; opacity: 0; pointer-events: none; }
 
+/* Vert avec un crochet : c'est sur la liste. Rouge avec une croix : on en a
+   déjà, donc pas la peine de l'acheter. */
 .article::before {
-  content: "";
+  content: "✓";
   position: absolute;
-  left: 0; top: 4px;
-  width: 12px; height: 12px;
-  border: 1.5px solid #d0bcab;
-  border-radius: 4px;
-  background: #fff;
-  transition: background 0.15s, border-color 0.15s;
+  left: 0; top: 2.5px;
+  width: 15px; height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: var(--olive);
+  border-radius: 5px;
+  transition: background 0.15s, transform 0.15s;
 }
 
-.article:hover::before { border-color: var(--olive); }
+.article:hover::before { transform: scale(1.12); }
 
-.article.est-deja::before { background: var(--olive); border-color: var(--olive); }
-
-.article.est-deja::after {
-  content: "";
-  position: absolute;
-  left: 4.2px; top: 6.2px;
-  width: 3px; height: 6.5px;
-  border: solid #fff;
-  border-width: 0 2px 2px 0;
-  transform: rotate(43deg);
-}
+.article.est-deja::before { content: "✕"; background: #c8391c; }
 
 .article.est-deja .ingredient-nom {
   text-decoration: line-through;

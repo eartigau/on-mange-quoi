@@ -85,9 +85,10 @@ quoi remplacer si on change d'idée dans l'allée. Trois sorties : le PDF
 en petit au bout de la ligne), l'impression directe, et une copie en texte brut
 à coller dans un message.
 
-Chaque ingrédient de la liste porte une case à cocher **on en a déjà** : on la
-coche pour ce qui est déjà au garde-manger, la ligne se barre et disparaît du
-PDF, de l'impression et du texte copié. Elle reste visible barrée à l'écran,
+Chaque ingrédient de la liste part avec un **crochet vert** : il est sur la
+liste, on l'achète. Un clic le passe en **croix rouge** et barre la ligne :
+c'est du déjà-vu au garde-manger, ça disparaît du PDF, de l'impression et du
+texte copié. La ligne reste visible barrée à l'écran,
 justement pour qu'on n'oublie jamais ce qu'on a écarté, et le compteur de
 chaque rayon passe en « reste / total ». Le bouton **Tout remettre** annule
 d'un coup. Ces marques sont mémorisées d'une visite à l'autre, pensez à les
