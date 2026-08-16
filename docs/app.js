@@ -19,6 +19,7 @@ const D = {
   rayonDe: {},         // ingrédient -> id de rayon
   choisies: new Set(), // noms des recettes cochées
   dejaLa: new Set(),   // ingrédients qu'on a déjà, écartés de la liste finale
+  extras: [],          // articles ajoutés à la main, hors recette
   filtres: new Set(),  // tags actifs
   recherche: '',
   ecriture: false,     // vrai si le serveur local peut écrire les YAML
@@ -28,6 +29,8 @@ const D = {
 const CLE_STOCKAGE = 'on-mange-quoi/choisies';
 const CLE_ECONOME = 'on-mange-quoi/pdf-econome';
 const CLE_DEJA = 'on-mange-quoi/deja-la';
+const CLE_EXTRAS = 'on-mange-quoi/extras';
+const SOURCE_EXTRA = 'ajouté à la main';
 const RAYON_DEFAUT = 'autre';
 
 /* ─────────────────────────────────────────────────── petits utilitaires ── */
@@ -282,12 +285,192 @@ function relireDeja() {
   } catch (e) { /* rien à relire */ }
 }
 
+function memoriserExtras() {
+  try {
+    localStorage.setItem(CLE_EXTRAS, JSON.stringify(D.extras));
+  } catch (e) { /* navigation privée : tant pis */ }
+}
+
+function relireExtras() {
+  try {
+    const brut = JSON.parse(localStorage.getItem(CLE_EXTRAS) || '[]');
+    if (Array.isArray(brut)) {
+      D.extras = brut
+        .filter((x) => x && typeof x.nom === 'string' && x.nom.trim())
+        .map((x) => ({ nom: String(x.nom).trim(), quantite: String(x.quantite || '').trim() }));
+    }
+  } catch (e) { /* rien à relire */ }
+}
+
 function relireChoix() {
   try {
     const brut = JSON.parse(localStorage.getItem(CLE_STOCKAGE) || '[]');
     const connus = new Set(D.recettes.map((r) => r.nom));
     brut.filter((n) => connus.has(n)).forEach((n) => D.choisies.add(n));
   } catch (e) { /* rien à relire */ }
+}
+
+/* ────────────────────────────────────────────────────────── quantités ────
+
+   Une ligne d'ingrédient peut porter une quantité entre parenthèses, à la
+   fin : « beurre (250 g) », « oignon (2) », « crème 15% (1 tasse) ». La
+   quantité ne fait jamais partie du nom : c'est toujours « beurre » qui est
+   rangé dans un rayon et qui se cumule d'une recette à l'autre.
+
+   Les parenthèses ne sont lues comme une quantité que si leur contenu
+   commence par un chiffre ou une fraction. « pâte brisée (surgelée) » reste
+   donc un nom complet, avec sa parenthèse.
+*/
+
+// Unités de masse ramenées au gramme, unités de volume ramenées au millilitre.
+// Les cuillères et la tasse suivent l'usage d'ici : tasse = 250 ml,
+// c. à soupe = 15 ml, c. à thé = 5 ml.
+const MASSES = {
+  mg: 0.001, g: 1, gr: 1, gramme: 1, grammes: 1,
+  kg: 1000, kilo: 1000, kilos: 1000,
+  lb: 453.59237, livre: 453.59237, livres: 453.59237, oz: 28.349523125,
+};
+
+const VOLUMES = {
+  ml: 1, millilitre: 1, millilitres: 1, cl: 10, dl: 100,
+  l: 1000, litre: 1000, litres: 1000,
+  tasse: 250, tasses: 250,
+  'c. à soupe': 15, 'c. a soupe': 15, 'c. à table': 15, 'cuillère à soupe': 15,
+  'cuillères à soupe': 15, 'cs': 15, 'c.s.': 15,
+  'c. à thé': 5, 'c. a the': 5, 'c. à café': 5, 'cuillère à thé': 5,
+  'cuillères à thé': 5, 'cc': 5, 'c.t.': 5,
+};
+
+const FRACTIONS = { '½': 0.5, '⅓': 1 / 3, '⅔': 2 / 3, '¼': 0.25, '¾': 0.75, '⅛': 0.125 };
+
+/** Lit « 1,5 », « 1/2 », « 1 1/2 » ou « ½ ». Renvoie null si ce n'est pas un nombre. */
+function lireNombre(texte) {
+  let total = 0;
+  let vu = false;
+  for (const bout of texte.trim().split(/\s+/)) {
+    if (FRACTIONS[bout] !== undefined) { total += FRACTIONS[bout]; vu = true; continue; }
+    const frac = bout.match(/^(\d+)\/(\d+)$/);
+    if (frac) { total += Number(frac[1]) / Number(frac[2]); vu = true; continue; }
+    const nombre = Number(bout.replace(',', '.'));
+    if (bout !== '' && Number.isFinite(nombre)) { total += nombre; vu = true; continue; }
+    return null;
+  }
+  return vu ? total : null;
+}
+
+/**
+ * Sépare « beurre (250 g) » en { nom: 'beurre', quantite: {...} }.
+ * Sans parenthèse de quantité, quantite vaut null et le nom est la ligne
+ * entière, parenthèses comprises.
+ */
+function analyserIngredient(ligne) {
+  const brut = String(ligne).trim();
+  const m = brut.match(/^(.*?)\s*\(([^()]*)\)$/);
+  if (!m) return { nom: brut, quantite: null };
+
+  const dedans = m[2].trim();
+  // Un contenu qui ne commence pas par un chiffre appartient au nom.
+  if (!/^[\d½⅓⅔¼¾⅛]/.test(dedans)) return { nom: brut, quantite: null };
+
+  const coupe = dedans.match(/^([\d.,\s/½⅓⅔¼¾⅛]+)(.*)$/);
+  const valeur = coupe ? lireNombre(coupe[1]) : null;
+  if (valeur === null) return { nom: brut, quantite: null };
+
+  const etiquette = (coupe[2] || '').trim();
+  const cle = pliage(etiquette).replace(/\s+/g, ' ');
+  let famille = 'autre';
+  if (etiquette === '') famille = 'unite';
+  else if (MASSES[cle] !== undefined || MASSES[etiquette] !== undefined) famille = 'masse';
+  else if (VOLUMES[cle] !== undefined || VOLUMES[etiquette] !== undefined) famille = 'volume';
+
+  return {
+    nom: m[1].trim() || brut,
+    quantite: { valeur, unite: etiquette, famille },
+  };
+}
+
+function facteur(table, unite) {
+  const cle = pliage(unite).replace(/\s+/g, ' ');
+  return table[cle] !== undefined ? table[cle] : table[unite];
+}
+
+/** Nombre à la française : virgule décimale, pas de zéros inutiles. */
+function nombreFr(v) {
+  return (Math.round(v * 100) / 100).toString().replace('.', ',');
+}
+
+// Les symboles d'unités ne prennent jamais de s : « 3 kg », pas « 3 kgs ».
+const UNITES_INVARIABLES = new Set(['g', 'kg', 'mg', 'ml', 'cl', 'dl', 'l', 'lb', 'oz']);
+
+function pluriel(n, mot) {
+  if (n <= 1 || mot === '') return mot;
+  if (UNITES_INVARIABLES.has(mot.toLowerCase())) return mot;
+  // Une abréviation en plusieurs morceaux (« c. à soupe ») reste telle quelle.
+  if (/[.\s]/.test(mot)) return mot;
+  if (/[sxz]$/i.test(mot)) return mot;
+  return mot + 's';
+}
+
+/**
+ * Additionne les quantités d'un même ingrédient.
+ * Renvoie { texte, complet } : le total lisible, et si toutes les recettes
+ * avaient bien une quantité. Renvoie null si aucune n'en avait.
+ */
+function totaliser(quantites, nbOccurrences) {
+  const presentes = quantites.filter(Boolean);
+  if (!presentes.length) return null;
+
+  const paquets = new Map();
+  presentes.forEach((q) => {
+    // Les masses se cumulent entre elles, les volumes entre eux, et chaque
+    // unité maison (boîte, botte, gousse…) reste dans son coin.
+    const cle = q.famille === 'autre'
+      ? 'autre:' + pliage(q.unite).replace(/s$/, '')
+      : q.famille;
+    if (!paquets.has(cle)) paquets.set(cle, []);
+    paquets.get(cle).push(q);
+  });
+
+  const bouts = [];
+  paquets.forEach((liste, cle) => {
+    if (cle === 'unite') {
+      bouts.push(nombreFr(liste.reduce((s, q) => s + q.valeur, 0)));
+      return;
+    }
+
+    if (cle === 'masse' || cle === 'volume') {
+      const table = cle === 'masse' ? MASSES : VOLUMES;
+      const base = liste.reduce((s, q) => s + q.valeur * (facteur(table, q.unite) || 1), 0);
+      const petite = cle === 'masse' ? 'g' : 'ml';
+      const grosse = cle === 'masse' ? 'kg' : 'l';
+      const unites = new Set(liste.map((q) => q.unite.toLowerCase()));
+
+      // Si tout le monde parlait la même unité, on la garde : deux tasses
+      // restent deux tasses plutôt que de devenir 500 ml. Seule exception,
+      // les grammes et les millilitres passent aux kilos et aux litres une
+      // fois le millier franchi, ça se lit mieux dans une allée.
+      if (unites.size === 1 && !(base >= 1000 && unites.has(petite))) {
+        const u = liste[0].unite;
+        const v = base / (facteur(table, u) || 1);
+        bouts.push(`${nombreFr(v)} ${pluriel(v, u)}`.trim());
+        return;
+      }
+
+      bouts.push(base >= 1000 ? `${nombreFr(base / 1000)} ${grosse}` : `${nombreFr(base)} ${petite}`);
+      return;
+    }
+
+    const somme = liste.reduce((s, q) => s + q.valeur, 0);
+    bouts.push(`${nombreFr(somme)} ${pluriel(somme, liste[0].unite)}`);
+  });
+
+  return { texte: bouts.join(' + '), complet: presentes.length === nbOccurrences };
+}
+
+/** Le total tel qu'il s'affiche : « 250 g », ou « 250 g + ? » s'il en manque. */
+function texteQuantite(article) {
+  if (!article.total) return '';
+  return article.total.complet ? article.total.texte : article.total.texte + ' + ?';
 }
 
 /* ─────────────────────────────────────────────── compilation de la liste ── */
@@ -302,18 +485,38 @@ function compilerListe() {
   const choisies = D.recettes.filter((r) => D.choisies.has(r.nom));
 
   choisies.forEach((r) => {
-    r.ingredients.forEach((i) => {
-      if (!parIngredient.has(i)) parIngredient.set(i, []);
-      const sources = parIngredient.get(i);
-      if (!sources.includes(r.nom)) sources.push(r.nom);
+    r.ingredients.forEach((ligne) => {
+      // Le nom seul sert de clé : « beurre (250 g) » et « beurre (1 c. à
+      // soupe) » sont le même beurre, et leurs quantités s'additionnent.
+      const { nom, quantite } = analyserIngredient(ligne);
+      if (!parIngredient.has(nom)) parIngredient.set(nom, { sources: [], quantites: [] });
+      const entree = parIngredient.get(nom);
+      if (!entree.sources.includes(r.nom)) entree.sources.push(r.nom);
+      entree.quantites.push(quantite);
     });
   });
 
+  // Les articles ajoutés à la main rejoignent la liste comme les autres :
+  // même rayon, même cumul de quantités, avec leur propre provenance.
+  D.extras.forEach(({ nom, quantite }) => {
+    const propre = nom.trim();
+    if (!propre) return;
+    const lu = analyserIngredient(quantite ? `${propre} (${quantite})` : propre);
+    if (!parIngredient.has(lu.nom)) parIngredient.set(lu.nom, { sources: [], quantites: [] });
+    const entree = parIngredient.get(lu.nom);
+    if (!entree.sources.includes(SOURCE_EXTRA)) entree.sources.push(SOURCE_EXTRA);
+    entree.quantites.push(lu.quantite);
+  });
+
   const paquets = new Map();
-  parIngredient.forEach((sources, nom) => {
+  parIngredient.forEach(({ sources, quantites }, nom) => {
     const rayon = D.rayonDe[nom] || RAYON_DEFAUT;
     if (!paquets.has(rayon)) paquets.set(rayon, []);
-    paquets.get(rayon).push({ nom, sources });
+    paquets.get(rayon).push({
+      nom,
+      sources,
+      total: totaliser(quantites, quantites.length),
+    });
   });
 
   const connus = new Set(D.meta.rayons.map((r) => r.id));
@@ -423,7 +626,7 @@ function rendreListe() {
   hote.innerHTML = '';
 
   const choisies = D.recettes.filter((r) => D.choisies.has(r.nom));
-  const vide = choisies.length === 0;
+  const vide = choisies.length === 0 && D.extras.length === 0;
   const aAcheter = vide ? [] : listeAAcheter();
   const rienAAcheter = aAcheter.length === 0;
 
@@ -489,6 +692,8 @@ function rendreListe() {
 
       etiquette.appendChild(boite);
       etiquette.appendChild(creer('span', 'ingredient-nom', a.nom));
+      const total = texteQuantite(a);
+      if (total) etiquette.appendChild(creer('span', 'ingredient-quantite', total));
       etiquette.appendChild(creer('span', 'ingredient-source', a.sources.join(', ')));
       li.appendChild(etiquette);
       ul.appendChild(li);
@@ -498,9 +703,40 @@ function rendreListe() {
   });
 }
 
+function rendreExtras() {
+  const dl = E('tousIngredients');
+  dl.innerHTML = '';
+  tousIngredientsConnus().forEach((i) => {
+    const o = creer('option');
+    o.value = i;
+    dl.appendChild(o);
+  });
+
+  const hote = E('listeExtras');
+  hote.innerHTML = '';
+  hote.hidden = D.extras.length === 0;
+
+  D.extras.forEach((x, i) => {
+    const jeton = creer('span', 'jeton');
+    jeton.appendChild(document.createTextNode(x.quantite ? `${x.nom} (${x.quantite})` : x.nom));
+    const croix = creer('button', null, '×');
+    croix.type = 'button';
+    croix.title = 'Retirer de la liste';
+    croix.addEventListener('click', () => {
+      D.extras.splice(i, 1);
+      memoriserExtras();
+      rendreExtras();
+      rendreListe();
+    });
+    jeton.appendChild(croix);
+    hote.appendChild(jeton);
+  });
+}
+
 function rendreChoisir() {
   rendreFiltres();
   rendreGrille();
+  rendreExtras();
   rendreListe();
   rendrePied();
 }
@@ -512,9 +748,16 @@ function rendrePied() {
     (nonClasses ? ` · ${nonClasses} à classer` : '');
 }
 
+/** Tous les articles connus : ceux des recettes et ceux déclarés dans les
+    rayons, y compris ce qui ne se mange pas. */
+function tousIngredientsConnus() {
+  return [...new Set([...ingredientsUtilises(), ...Object.keys(D.rayonDe)])].sort(triFr);
+}
+
+/** Tous les noms d'ingrédients connus, quantités retirées. */
 function ingredientsUtilises() {
   const s = new Set();
-  D.recettes.forEach((r) => r.ingredients.forEach((i) => s.add(i)));
+  D.recettes.forEach((r) => r.ingredients.forEach((i) => s.add(analyserIngredient(i).nom)));
   return [...s].sort(triFr);
 }
 
@@ -529,7 +772,8 @@ function listeEnTexte() {
   listeAAcheter().forEach(({ rayon, articles }) => {
     lignes.push(rayon.nom.toUpperCase());
     articles.forEach((a) => {
-      lignes.push(`  [ ] ${a.nom}  (${a.sources.join(', ')})`);
+      const total = texteQuantite(a);
+      lignes.push(`  [ ] ${a.nom}${total ? ' ' + total : ''}  (${a.sources.join(', ')})`);
     });
     lignes.push('');
   });
@@ -546,7 +790,13 @@ function construirePdf(options) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-  const PAGE_L = 210, PAGE_H = 297, MARGE = 15, ECART = 9;
+  // Les presbytes de la famille : tout le corps de la liste est agrandi de
+  // moitié. Un seul chiffre à changer si ça ne suffit toujours pas.
+  const Z = 1.5;
+  const T_NOM = 8.8 * Z, T_SRC = 6.6 * Z, T_RAYON = 9.5 * Z;
+  const T_MENU = 9 * Z, T_ETIQ = 7.5 * Z, T_PIED = 7 * Z;
+
+  const PAGE_L = 210, PAGE_H = 297, MARGE = 15, ECART = 8;
   const COL_L = (PAGE_L - 2 * MARGE - ECART) / 2;
   const BAS = PAGE_H - MARGE - 6;
 
@@ -566,7 +816,7 @@ function construirePdf(options) {
   let page = 1;
 
   function enTetePage(premiere) {
-    const h = premiere ? 24 : 16;
+    const h = premiere ? 26 : 18;
     // Fond blanc explicite : certaines visionneuses affichent autrement une
     // page transparente sur du gris ou du noir.
     doc.setFillColor(255, 255, 255);
@@ -576,17 +826,17 @@ function construirePdf(options) {
       // Un simple filet sous le titre au lieu du bandeau plein.
       doc.setTextColor(0, 0, 0);
       doc.setFont('Fraunces', 'bold');
-      doc.setFontSize(premiere ? 18 : 12.5);
-      doc.text('On mange quoi ?', MARGE, premiere ? 15 : 11);
+      doc.setFontSize(premiere ? 20 : 14);
+      doc.text('On mange quoi ?', MARGE, premiere ? 16 : 12);
       doc.setFont('Outfit', 'normal');
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       doc.setTextColor(...GRIS);
       doc.text("Liste d'épicerie · " + dateLongue(maintenant),
-        PAGE_L - MARGE, premiere ? 15 : 11, { align: 'right' });
+        PAGE_L - MARGE, premiere ? 16 : 12, { align: 'right' });
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.6);
-      doc.line(MARGE, premiere ? 18.5 : 14, PAGE_L - MARGE, premiere ? 18.5 : 14);
-      return premiere ? 21 : 16;
+      doc.line(MARGE, premiere ? 19.5 : 15, PAGE_L - MARGE, premiere ? 19.5 : 15);
+      return premiere ? 22 : 17;
     }
 
     // Le bandeau rayé du store de bistrot, repris de la page.
@@ -597,19 +847,19 @@ function construirePdf(options) {
 
     doc.setTextColor(255, 255, 255);
     doc.setFont('Fraunces', 'bold');
-    doc.setFontSize(premiere ? 18 : 12.5);
-    doc.text('On mange quoi ?', MARGE, premiere ? 15.5 : 11);
+    doc.setFontSize(premiere ? 20 : 14);
+    doc.text('On mange quoi ?', MARGE, premiere ? 16.5 : 12);
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(9.5);
     doc.setTextColor(255, 238, 226);
     doc.text("Liste d'épicerie · " + dateLongue(maintenant),
-      PAGE_L - MARGE, premiere ? 15.5 : 11, { align: 'right' });
+      PAGE_L - MARGE, premiere ? 16.5 : 12, { align: 'right' });
     return h;
   }
 
   function piedPage() {
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(7);
+    doc.setFontSize(T_PIED);
     doc.setTextColor(...GRIS);
     doc.text(`${choisies.length} repas · ${groupes.reduce((n, g) => n + g.articles.length, 0)} articles`,
       MARGE, PAGE_H - 9);
@@ -620,19 +870,19 @@ function construirePdf(options) {
   let hautColonnes = enTetePage(true) + 8;
 
   doc.setFont('Outfit', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(T_ETIQ);
   doc.setTextColor(...TOMATE);
   doc.text('AU MENU', MARGE, hautColonnes);
-  hautColonnes += 4.5;
+  hautColonnes += 6;
 
   doc.setFont('Outfit', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(T_MENU);
   doc.setTextColor(...ENCRE);
   const menu = doc.splitTextToSize(
     choisies.map((r) => r.nom + (r.portions ? ` (${r.portions})` : '')).join('   ·   '),
     PAGE_L - 2 * MARGE);
   doc.text(menu, MARGE, hautColonnes);
-  hautColonnes += menu.length * 4 + 3;
+  hautColonnes += menu.length * 5.8 + 4;
 
   doc.setDrawColor(...(eco ? [170, 170, 170] : [226, 208, 190]));
   doc.setLineWidth(0.4);
@@ -664,21 +914,21 @@ function construirePdf(options) {
 
   function dessinerTitreRayon(rayon, teinte) {
     doc.setFont('Fraunces', 'bold');
-    doc.setFontSize(9.5);
+    doc.setFontSize(T_RAYON);
     doc.setTextColor(...teinte);
     doc.text(rayon.nom, x(), y);
     doc.setDrawColor(...teinte);
-    doc.setLineWidth(0.45);
-    doc.line(x(), y + 1.7, x() + COL_L, y + 1.7);
-    y += 6;
+    doc.setLineWidth(0.6);
+    doc.line(x(), y + 2.3, x() + COL_L, y + 2.3);
+    y += 8.5;
   }
 
   // Géométrie d'un article : la case à cocher, le nom, puis la provenance
   // entre parenthèses en plus petit, au bout de la même ligne.
-  const RETRAIT = 5;      // décalage du texte, après la case à cocher
-  const H_NOM = 3.9;      // avance sous la ligne du nom
-  const H_SUITE = 2.8;    // avance sous chaque ligne de provenance en dessous
-  const BOUT_MINI = 14;   // en deçà, la provenance passe directement à la ligne
+  const RETRAIT = 7.4;     // décalage du texte, après la case à cocher
+  const H_NOM = 5.9;       // avance sous la ligne du nom
+  const H_SUITE = 4.2;     // avance sous chaque ligne de provenance en dessous
+  const BOUT_MINI = 21;    // en deçà, la provenance passe directement à la ligne
 
   /**
    * Découpe la provenance en lignes. La première tient au bout de la ligne du
@@ -687,7 +937,7 @@ function construirePdf(options) {
    */
   function decouperProvenance(texte, placeBout) {
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(6.6);
+    doc.setFontSize(T_SRC);
     const pleine = COL_L - RETRAIT;
     const lignes = [''];
     texte.split(' ').forEach((mot) => {
@@ -704,12 +954,22 @@ function construirePdf(options) {
   /** Mesure sans rien dessiner : hauteur, lignes, et où commence le bout. */
   function mesurerArticle(a) {
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(8.8);
-    const finNom = RETRAIT + doc.getTextWidth(a.nom) + 1.3;
+    doc.setFontSize(T_NOM);
+    let fin = RETRAIT + doc.getTextWidth(a.nom);
+
+    // La quantité totale se glisse entre le nom et la provenance.
+    const qte = texteQuantite(a);
+    const debutQte = fin + 2.4;
+    if (qte) {
+      doc.setFont('Outfit', 'bold');
+      fin = debutQte + doc.getTextWidth(qte);
+    }
+
+    const finNom = fin + 2.4;
     const placeBout = COL_L - finNom;
     const lignes = decouperProvenance('(' + a.sources.join(', ') + ')',
       placeBout >= BOUT_MINI ? placeBout : 0);
-    return { finNom, lignes, hauteur: H_NOM + (lignes.length - 1) * H_SUITE + 0.5 };
+    return { qte, debutQte, finNom, lignes, hauteur: H_NOM + (lignes.length - 1) * H_SUITE + 0.5 };
   }
 
   function dessinerArticle(a) {
@@ -718,14 +978,21 @@ function construirePdf(options) {
     // La case à cocher, pour barrer au crayon dans l'allée.
     doc.setDrawColor(...(eco ? [90, 90, 90] : [198, 176, 156]));
     doc.setLineWidth(0.3);
-    doc.roundedRect(x(), y - 2.4, 2.9, 2.9, 0.6, 0.6);
+    doc.roundedRect(x(), y - 3.5, 4.3, 4.3, 0.9, 0.9);
 
     doc.setFont('Outfit', 'normal');
-    doc.setFontSize(8.8);
+    doc.setFontSize(T_NOM);
     doc.setTextColor(...ENCRE);
     doc.text(a.nom, x() + RETRAIT, y);
 
-    doc.setFontSize(6.6);
+    // En gras : c'est le chiffre qu'on cherche des yeux dans l'allée.
+    if (m.qte) {
+      doc.setFont('Outfit', 'bold');
+      doc.text(m.qte, x() + m.debutQte, y);
+    }
+
+    doc.setFont('Outfit', 'normal');
+    doc.setFontSize(T_SRC);
     doc.setTextColor(...GRIS);
     let yy = y;
     m.lignes.forEach((ligne, i) => {
@@ -745,7 +1012,7 @@ function construirePdf(options) {
       ? [179, 52, 28]
       : PALETTE[i % PALETTE.length];
     // On ne laisse jamais un titre de rayon seul en bas de colonne.
-    if (placeRestante() < 6 + mesurerArticle(articles[0]).hauteur) colonneSuivante();
+    if (placeRestante() < 8.5 + mesurerArticle(articles[0]).hauteur) colonneSuivante();
     dessinerTitreRayon(rayon, teinte);
     articles.forEach((a) => {
       if (placeRestante() < mesurerArticle(a).hauteur) {
@@ -754,7 +1021,7 @@ function construirePdf(options) {
       }
       dessinerArticle(a);
     });
-    y += 2.5;
+    y += 4;
   });
 
   piedPage();
@@ -772,10 +1039,29 @@ function telechargerPdf() {
 function rendreGerer() {
   rendreChoixRecette();
   rendreFormulaire();
+  rendreSauvegarde();
+}
+
+/** L'onglet « Gérer les ingrédients » : le formulaire et la liste des rayons. */
+function rendreGererIngredients() {
+  const sel = E('iRayon');
+  const garde = sel.value;
+  sel.innerHTML = '';
+  D.meta.rayons.filter((r) => r.id !== RAYON_DEFAUT).forEach((r) => {
+    const o = creer('option', null, `${r.icone || ''} ${r.nom}`.trim());
+    o.value = r.id;
+    sel.appendChild(o);
+  });
+  if (garde) sel.value = garde;
+
   rendreIngredients();
+  rendreSauvegarde();
+}
+
+function rendreSauvegarde() {
   E('explicationSauvegarde').textContent = D.ecriture
-    ? 'Le serveur local tourne : « Enregistrer les fichiers » réécrit data/recettes.yaml et data/ingredients.yaml (une copie .bak est gardée à chaque fois).'
-    : "Cette page est servie sans le serveur local, elle ne peut donc pas écrire sur le disque. Téléchargez les YAML et remplacez ceux du dossier data/, ou lancez python3 on-mange-quoi.py pour enregistrer directement.";
+    ? 'Le serveur local tourne : « Enregistrer les fichiers » réécrit docs/data/recettes.yaml et docs/data/ingredients.yaml (une copie .bak est gardée à chaque fois).'
+    : "Cette page est servie sans le serveur local, elle ne peut donc pas écrire sur le disque. Téléchargez les YAML et remplacez ceux du dossier docs/data/, ou lancez python3 on-mange-quoi.py à la maison pour enregistrer directement.";
   E('btnSauver').disabled = !D.ecriture;
 }
 
@@ -835,8 +1121,9 @@ function rendreFormulaire() {
 
 /** Prévient tout de suite si la recette introduit des ingrédients inconnus. */
 function apercuNouveaux() {
-  const lignes = E('fIngredients').value.split('\n').map((s) => s.trim()).filter(Boolean);
-  const inconnus = lignes.filter((i) => !D.rayonDe[i]);
+  const lignes = E('fIngredients').value.split('\n')
+    .map((s) => analyserIngredient(s).nom).filter(Boolean);
+  const inconnus = [...new Set(lignes.filter((i) => !D.rayonDe[i]))];
   const p = E('apercuNouveaux');
   if (!inconnus.length) {
     p.textContent = lignes.length ? `${lignes.length} ingrédients, tous déjà classés.` : '';
@@ -890,6 +1177,7 @@ function rendreIngredients() {
         else delete D.rayonDe[ing];
         rendreIngredients();
         rendrePied();
+        rendreExtras();
         rendreListe();
       });
       ligne.appendChild(sel);
@@ -981,6 +1269,13 @@ const ENTETE_RECETTES = `# Les repas de la famille.
 #   ingredients : un ingrédient par ligne. Le nom écrit ici doit correspondre à
 #                 une entrée de ingredients.yaml pour tomber dans le bon rayon,
 #                 sinon il finit dans « À classer ».
+#                 On peut ajouter une quantité entre parenthèses à la fin :
+#                 « beurre (250 g) », « oignon (2) », « lait (1 tasse) ». La
+#                 quantité ne fait pas partie du nom, et le site additionne
+#                 celles d'un même ingrédient d'une recette à l'autre. C'est
+#                 facultatif, ligne par ligne. Une parenthèse qui ne commence
+#                 pas par un chiffre appartient au nom, donc « pâte brisée
+#                 (surgelée) » reste entier.
 #   note        : optionnel, le truc de famille à ne pas oublier
 `;
 
@@ -1072,7 +1367,11 @@ function brancherOnglets() {
     [...E('onglets').querySelectorAll('.tab')].forEach((b) => b.classList.toggle('is-active', b === bouton));
     E('vue-choisir').hidden = vue !== 'choisir';
     E('vue-gerer').hidden = vue !== 'gerer';
+    E('vue-ingredients').hidden = vue !== 'ingredients';
+    // Enregistrer sert aux deux onglets de gestion, la carte les suit.
+    E('vue-sauvegarde').hidden = vue === 'choisir';
     if (vue === 'gerer') rendreGerer();
+    if (vue === 'ingredients') rendreGererIngredients();
   });
 }
 
@@ -1153,6 +1452,47 @@ function brancherEvenements() {
     }
   });
 
+  E('formExtra').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nom = E('extraNom').value.trim();
+    if (!nom) { toast('Il faut un nom d\'article.', true); return; }
+    const quantite = E('extraQte').value.trim();
+
+    const doublon = D.extras.find((x) => pliage(x.nom) === pliage(nom));
+    if (doublon) {
+      doublon.quantite = quantite;
+      toast(`« ${nom} » était déjà là, la quantité est mise à jour.`);
+    } else {
+      D.extras.push({ nom, quantite });
+    }
+
+    memoriserExtras();
+    E('extraNom').value = '';
+    E('extraQte').value = '';
+    E('extraNom').focus();
+    rendreExtras();
+    rendreListe();
+    if (!D.rayonDe[nom] && !doublon) {
+      toast(`« ${nom} » n'a pas de rayon, il ira dans « À classer ».`);
+    }
+  });
+
+  E('formIngredient').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nom = E('iNom').value.trim();
+    if (!nom) { toast('Il faut un nom.', true); return; }
+    if (D.rayonDe[nom]) { toast(`« ${nom} » est déjà dans la liste.`, true); return; }
+    D.rayonDe[nom] = E('iRayon').value;
+    E('iNom').value = '';
+    E('iNom').focus();
+    rendreGererIngredients();
+    rendreExtras();
+    rendrePied();
+    toast(D.ecriture
+      ? `« ${nom} » ajouté. Pensez à « Enregistrer les fichiers » plus bas.`
+      : `« ${nom} » ajouté en mémoire. Téléchargez ingredients.yaml pour le garder.`);
+  });
+
   E('choixRecette').addEventListener('change', (e) => {
     D.editee = e.target.value || null;
     rendreFormulaire();
@@ -1200,6 +1540,7 @@ async function demarrer() {
   await detecterMode();
   relireChoix();
   relireDeja();
+  relireExtras();
   brancherEvenements();
   rendreChoisir();
 }

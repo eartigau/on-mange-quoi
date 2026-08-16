@@ -12,6 +12,13 @@
 #   ingredients : un ingrédient par ligne. Le nom écrit ici doit correspondre à
 #                 une entrée de ingredients.yaml pour tomber dans le bon rayon,
 #                 sinon il finit dans « À classer ».
+#                 On peut ajouter une quantité entre parenthèses à la fin :
+#                 « beurre (250 g) », « oignon (2) », « lait (1 tasse) ». La
+#                 quantité ne fait pas partie du nom, et le site additionne
+#                 celles d'un même ingrédient d'une recette à l'autre. C'est
+#                 facultatif, ligne par ligne. Une parenthèse qui ne commence
+#                 pas par un chiffre appartient au nom, donc « pâte brisée
+#                 (surgelée) » reste entier.
 #   note        : optionnel, le truc de famille à ne pas oublier
 
 recettes:
@@ -114,12 +121,12 @@ recettes:
     tags: [soupe, hiver, express, végétarien, plaît aux enfants]
     portions: 4
     ingredients:
-      - brocoli
-      - pommes de terre
-      - oignon
-      - beurre
-      - bouillon de légumes
-      - crème 15%
+      - brocoli (1)
+      - pommes de terre (300 g)
+      - oignon (1)
+      - beurre (1 c. à soupe)
+      - bouillon de légumes (750 ml)
+      - crème 15% (125 ml)
       - muscade
 
   - nom: Soupe aux carottes
@@ -151,12 +158,12 @@ recettes:
     tags: [soupe, hiver, express, végétarien, plaît aux enfants]
     portions: 4
     ingredients:
-      - poireaux
-      - pommes de terre
-      - oignon
-      - beurre
-      - bouillon de légumes
-      - crème 15%
+      - poireaux (4)
+      - pommes de terre (500 g)
+      - oignon (1)
+      - beurre (2 c. à soupe)
+      - bouillon de légumes (1 l)
+      - crème 15% (125 ml)
     note: Passer au mélangeur à main, c'est bien meilleur velouté.
 
   - nom: Soupe aux épinards
@@ -482,16 +489,16 @@ recettes:
     tags: [plat principal, hiver, mijoté, restes pour la boîte à lunch]
     portions: 6
     ingredients:
-      - bœuf haché
-      - haricots rouges en conserve
-      - tomates en conserve
-      - poivron rouge
-      - oignon
-      - ail
+      - bœuf haché (500 g)
+      - haricots rouges en conserve (2 boîtes)
+      - tomates en conserve (1 boîte)
+      - poivron rouge (1)
+      - oignon (1)
+      - ail (2 gousses)
       - poudre de chili
       - cumin
-      - crème sure
-      - cheddar râpé
+      - crème sure (250 ml)
+      - cheddar râpé (200 g)
 
   - nom: Courgette et steak au cumin
     tags: [plat principal, été, express, sans gluten]
@@ -538,17 +545,17 @@ recettes:
     tags: [plat principal, toute l'année, mijoté, plaît aux enfants, restes pour la boîte à lunch]
     portions: 6
     ingredients:
-      - spaghettis
-      - bœuf haché
-      - tomates en conserve
-      - pâte de tomate
-      - carottes
-      - céleri
-      - oignon
-      - ail
+      - spaghettis (500 g)
+      - bœuf haché (500 g)
+      - tomates en conserve (2 boîtes)
+      - pâte de tomate (1 boîte)
+      - carottes (2)
+      - céleri (2 branches)
+      - oignon (1)
+      - ail (2 gousses)
       - origan séché
       - basilic séché
-      - huile d'olive
+      - huile d'olive (2 c. à soupe)
       - parmesan
 
   - nom: Pâtes carbonara
@@ -622,14 +629,14 @@ recettes:
     tags: [plat principal, toute l'année, en semaine, plaît aux enfants]
     portions: 4
     ingredients:
-      - farine tout usage
-      - œufs
-      - lait
-      - beurre
-      - jambon
-      - gruyère râpé
-      - champignons
-      - crème 15%
+      - farine tout usage (250 g)
+      - œufs (3)
+      - lait (500 ml)
+      - beurre (30 g)
+      - jambon (200 g)
+      - gruyère râpé (150 g)
+      - champignons (250 g)
+      - crème 15% (125 ml)
 
   - nom: Escalope de poulet à la moutarde
     tags: [plat principal, toute l'année, express]

@@ -13,8 +13,8 @@ contiennent tout le contenu, et c'est là qu'on modifie les choses :
 
 | Fichier | Ce qu'il contient |
 | --- | --- |
-| [docs/data/recettes.yaml](docs/data/recettes.yaml) | Les 50 repas : nom, tags, portions, liste d'ingrédients, note |
-| [docs/data/ingredients.yaml](docs/data/ingredients.yaml) | Le rayon de chaque ingrédient (« persil » → légumes frais) |
+| [docs/data/recettes.yaml](docs/data/recettes.yaml) | Les 50 repas : nom, tags, portions, liste d'ingrédients avec quantités, note |
+| [docs/data/ingredients.yaml](docs/data/ingredients.yaml) | Le rayon de chaque article (« persil » → légumes frais), nourriture ou non |
 | [docs/data/meta.yaml](docs/data/meta.yaml) | L'ordre des rayons à l'épicerie et les groupes de tags des filtres |
 
 La page elle-même : [index.html](docs/index.html) pour la structure,
@@ -36,6 +36,8 @@ la maison quand on veut modifier les recettes depuis la page plutôt que dans un
 cd on-mange-quoi
 python3 on-mange-quoi.py
 ```
+
+Les alias `repas` et `bouffe` font exactement ça depuis n'importe où.
 
 Le navigateur s'ouvre sur `http://127.0.0.1:5757/`. Aucune installation, aucun
 `pip install` : le serveur n'utilise que la bibliothèque standard de Python 3.
@@ -87,12 +89,39 @@ est pratique un soir de panne d'inspiration.
 Les repas cochés sont mémorisés dans le navigateur : on peut fermer l'onglet et
 revenir, la sélection est toujours là.
 
-**La liste.** Elle se compile toute seule sous les repas. Chaque ingrédient
-indique entre parenthèses les plats qui le demandent, ce qui permet de savoir
-quoi remplacer si on change d'idée dans l'allée. Trois sorties : le PDF
-(deux colonnes serrées, une case à cocher devant chaque article, la provenance
-en petit au bout de la ligne), l'impression directe, et une copie en texte brut
-à coller dans un message.
+**À ajouter quand même.** Sous les repas, une case sert à mettre sur la liste
+ce qui ne vient d'aucune recette : le café, le savon, l'eau micellaire. Elle
+propose tous les articles connus au fur et à mesure de la frappe, avec une
+quantité facultative. Ces ajouts se rangent dans leur rayon comme le reste, et
+se cumulent avec les recettes : deux oignons ajoutés à la main s'additionnent
+aux quatre des recettes.
+
+**La liste.** Elle se compile toute seule sous les repas. Chaque article porte
+son total et, entre parenthèses, les plats qui le demandent, ce qui permet de
+savoir quoi remplacer si on change d'idée dans l'allée. Trois sorties : le PDF
+(deux colonnes, une case à cocher devant chaque article, la quantité en gras et
+la provenance en petit au bout de la ligne), l'impression directe, et une copie
+en texte brut à coller dans un message.
+
+**Les quantités.** Elles s'écrivent entre parenthèses à la fin d'une ligne
+d'ingrédient et sont toujours facultatives : `beurre (250 g)`, `oignon (2)`,
+`lait (1 tasse)`, `ail (2 gousses)`. Le site les additionne d'une recette à
+l'autre et convertit ce qui est convertible, en gardant l'unité de la recette
+tant que tout le monde parle la même langue :
+
+| Ce qui est écrit | Ce qui sort |
+| --- | --- |
+| 500 g + 750 g | 1,25 kg |
+| 1 l + 750 ml | 1,75 l |
+| 1 tasse + 1 tasse | 2 tasses |
+| 2 c. à soupe + 1 c. à soupe | 3 c. à soupe |
+| 1 boîte + 200 g | 1 boîte + 200 g |
+| 250 g, et une recette sans quantité | 250 g + ? |
+
+La tasse vaut 250 ml, la cuillère à soupe 15 ml, la cuillère à thé 5 ml, comme
+d'habitude ici. Le `+ ?` signale qu'au moins une recette ne disait pas combien.
+Une parenthèse qui ne commence pas par un chiffre appartient au nom, donc
+`pâte brisée (surgelée)` reste entier.
 
 Chaque ingrédient de la liste part avec un **crochet vert** : il est sur la
 liste, on l'achète. Un clic le passe en **croix rouge** et barre la ligne :
@@ -105,14 +134,24 @@ remettre à zéro quand le garde-manger se vide.
 
 La case **Économiser l'encre** sort le même PDF entièrement en noir sur blanc :
 plus de bandeau plein ni de titres colorés, juste un filet sous le titre. Une
-semaine de repas tient alors couramment sur une seule page, et l'imprimante ne
-dépense presque rien. Le choix est mémorisé d'une fois à l'autre, et le fichier
-est suffixé `-nb` pour ne pas se mélanger avec la version couleur.
+semaine de repas tient alors sur peu de pages, et l'imprimante ne dépense
+presque rien. Le choix est mémorisé d'une fois à l'autre, et le fichier est
+suffixé `-nb` pour ne pas se mélanger avec la version couleur.
 
-**Gérer les recettes.** Le formulaire ajoute ou modifie un plat. Si la recette
-introduit des ingrédients jamais vus, la page le signale tout de suite, et la
-carte de droite sert à leur attribuer un rayon. Un ingrédient sans rayon n'est
-jamais perdu : il atterrit dans « À classer », bien visible au bas de la liste.
+Le corps de texte du PDF est volontairement grand, pour se lire à bout de bras
+dans une allée sans chercher ses lunettes. Un seul chiffre le règle, la
+constante `Z` au début de `construirePdf` dans `docs/app.js`.
+
+**Gérer les recettes.** Le formulaire ajoute ou modifie un plat, avec un
+aide-mémoire du format à côté. Si la recette introduit des ingrédients jamais
+vus, la page le signale tout de suite.
+
+**Gérer les ingrédients.** Le deuxième onglet de gestion sert à déclarer un
+nouvel article et son rayon, et à corriger le rayon de ceux qui existent. Rien
+n'oblige à ce que ce soit de la nourriture : le savon, le papier ou l'eau
+micellaire se rangent dans « Soins et nettoyage » et se retrouvent sur la liste
+comme le reste. Un article sans rayon n'est jamais perdu : il atterrit dans
+« À classer », bien visible au bas de la liste.
 
 ## Ajouter des choses à la main
 
@@ -123,10 +162,10 @@ Un repas de plus dans `docs/data/recettes.yaml` :
     tags: [plat principal, été, four, végétarien]
     portions: 4
     ingredients:
-      - courgettes
-      - crème 15%
-      - gruyère râpé
-      - ail
+      - courgettes (4)
+      - crème 15% (200 ml)
+      - gruyère râpé (150 g)
+      - ail (2 gousses)
     note: Bien égoutter les courgettes, sinon c'est de la soupe.
 ```
 

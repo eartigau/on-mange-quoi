@@ -580,3 +580,52 @@
   30%, 50%, 70% { transform: translateX(-8px); }
   40%, 60% { transform: translateX(8px); }
 }
+
+/* La quantité totale, glissée entre le nom et la provenance. */
+.ingredient-quantite {
+  margin-left: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--teinte, var(--encre));
+  white-space: nowrap;
+}
+
+.article.est-deja .ingredient-quantite { opacity: 0.5; text-decoration: line-through; }
+
+/* ── Ligne d'ajout d'un article hors recette ─────────────────────────── */
+
+.ligne-ajout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.ligne-ajout .champ { margin-bottom: 0; }
+.ligne-ajout #extraNom { flex: 1; min-width: 220px; }
+.ligne-ajout #extraQte { width: 130px; }
+
+#carte-extras .entete-carte { align-items: baseline; }
+#carte-extras .entete-carte .hint { margin: 0; flex: 1; min-width: 240px; }
+#carte-extras .menu-choisi { margin: 16px 0 0; padding-bottom: 0; border-bottom: 0; }
+
+/* Un article ajouté à la main se distingue des recettes cochées. */
+#listeExtras .jeton {
+  color: #4d7a24;
+  background: rgba(111, 154, 63, 0.12);
+  border-color: rgba(111, 154, 63, 0.4);
+}
+
+#listeExtras .jeton button { color: #6f9a3f; }
+
+#carte-aide code {
+  font-size: 0.82rem;
+  background: #fdf3e6;
+  border: 1px solid rgba(60, 42, 30, 0.1);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+@media print {
+  #carte-extras { display: none !important; }
+}

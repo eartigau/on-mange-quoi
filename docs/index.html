@@ -51,6 +51,7 @@
     <nav class="tabs" id="onglets">
       <button type="button" class="tab is-active" data-vue="choisir">Choisir les repas</button>
       <button type="button" class="tab" data-vue="gerer">Gérer les recettes</button>
+      <button type="button" class="tab" data-vue="ingredients">Gérer les ingrédients</button>
       <span class="mode-pill" id="modePill" title="">…</span>
     </nav>
   </header>
@@ -76,6 +77,21 @@
       </div>
       <div class="grille-recettes" id="grilleRecettes"></div>
       <p class="hint" id="messageVide" hidden>Aucun repas ne correspond à ces filtres.</p>
+    </section>
+
+    <section class="card span-3" id="carte-extras">
+      <div class="entete-carte">
+        <h2>À ajouter quand même</h2>
+        <p class="hint">Ce qu'on achète sans que ce soit dans une recette : le savon, le café, le pain de la semaine.</p>
+      </div>
+      <form class="ligne-ajout" id="formExtra" autocomplete="off">
+        <input type="text" id="extraNom" class="champ" list="tousIngredients"
+               placeholder="Ingrédient ou autre article…" />
+        <input type="text" id="extraQte" class="champ champ-court" placeholder="quantité" />
+        <button type="submit" class="btn btn-primaire">Ajouter</button>
+      </form>
+      <datalist id="tousIngredients"></datalist>
+      <div class="menu-choisi" id="listeExtras" hidden></div>
     </section>
 
     <section class="card span-3" id="carte-liste">
@@ -137,13 +153,56 @@
       </form>
     </section>
 
-    <section class="card" id="carte-ingredients">
+    <section class="card" id="carte-aide">
+      <h2>Comment ça s'écrit</h2>
+      <p class="hint">
+        Un ingrédient par ligne. Le nom doit correspondre à une entrée de la
+        liste des rayons, sinon il tombe dans « À classer ».
+      </p>
+      <p class="hint">
+        La quantité se met entre parenthèses, à la fin, et elle est facultative :
+        <code>beurre (250 g)</code>, <code>oignon (2)</code>,
+        <code>lait (1 tasse)</code>, <code>ail (2 gousses)</code>. Le site
+        additionne les quantités d'un même ingrédient d'une recette à l'autre,
+        et convertit ce qui est convertible.
+      </p>
+      <p class="hint">
+        Une parenthèse qui ne commence pas par un chiffre fait partie du nom :
+        <code>pâte brisée (surgelée)</code> reste entier.
+      </p>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════ Vue : gérer les ingrédients ═════════ -->
+  <main class="layout" id="vue-ingredients" hidden>
+
+    <section class="card" id="carte-nouvel-ingredient">
+      <h2>Nouvel ingrédient</h2>
+      <p class="hint">
+        Pas seulement de la nourriture : tout ce qui se met dans le panier a sa
+        place ici, savon, papier, eau micellaire.
+      </p>
+      <form id="formIngredient" autocomplete="off">
+        <label class="etiquette" for="iNom">Nom</label>
+        <input type="text" id="iNom" class="champ" placeholder="eau micellaire" required />
+
+        <label class="etiquette" for="iRayon">Rayon</label>
+        <select id="iRayon" class="champ"></select>
+
+        <button type="submit" class="btn btn-primaire btn-bloc">Ajouter à la liste des rayons</button>
+      </form>
+    </section>
+
+    <section class="card span-2" id="carte-ingredients">
       <h2>Rayon de chaque ingrédient</h2>
       <p class="hint" id="alerteNonClasses"></p>
       <input type="search" id="rechercheIngredient" class="champ" placeholder="Chercher un ingrédient…" autocomplete="off" />
       <div class="liste-ingredients" id="listeIngredients"></div>
     </section>
+  </main>
 
+  <!-- Carte d'enregistrement, commune aux deux onglets de gestion. -->
+  <main class="layout" id="vue-sauvegarde" hidden>
     <section class="card span-3" id="carte-sauvegarde">
       <h2>Enregistrer</h2>
       <p class="hint" id="explicationSauvegarde"></p>
