@@ -41,6 +41,9 @@ rayons:
   - id: entretien
     nom: Soins et nettoyage
     icone: 🧼
+  - id: varia
+    nom: Varia
+    icone: 🧺
   - id: autre
     nom: À classer
     icone: ❓
