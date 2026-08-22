@@ -158,12 +158,12 @@ rayons_par_ingredient:
   thon en conserve: conserves
   tomates en conserve: conserves
 
-  # Soins et nettoyage
-  eau micellaire: entretien
-
   # Collations et grignotines
   chips tortilla: collations
 
   # Petits-déjeuners
   miel: dejeuners
   sirop d'érable: dejeuners
+
+  # Soins et nettoyage
+  eau micellaire: entretien

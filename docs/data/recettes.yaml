@@ -255,13 +255,14 @@ recettes:
       - coriandre fraîche
       - oignon
       - ail
-      - cumin
-      - farine tout usage
+      - couscous
       - huile végétale
       - pains pita
       - tzatziki
       - tomates
       - laitue
+      - concombre
+      - oignons rouges
 
   - nom: Spanakopitas
     tags: [plat principal, toute l'année, réception, végétarien, four]
@@ -687,3 +688,15 @@ recettes:
       - crème 15%
       - gruyère râpé
       - muscade
+
+  - nom: Poke Bowl
+    tags: []
+    portions: 4
+    ingredients:
+      - Avocats (2)
+      - Edamaes (250 g)
+      - Riz (2 tasses)
+      - Saumon (500 g)
+      - Sauce soya (1 bouteille)
+      - Oignons verts (4)
+      - Vinaigre de riz (250 ml)
